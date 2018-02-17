@@ -1,9 +1,11 @@
 {
 	"name": "nyan-api",
-	"description": "nyan.stream API",
-	"version": "0.0.0",
+	"description": "nyan.stream API (prototype, not ready)",
+	"version": "0.0.1",
+	"author": "Dmitry <dmitry@cojam.ru> (https://e965.ru)",
 	"private": true,
-	"license": "UNLICENSED",
+	"repository": "github:nyanstream/api-server",
+	"license": "MIT",
 	"engines": {
 		"node": "8.9.4"
 	},
@@ -12,7 +14,7 @@
 		"start": "node server.js"
 	},
 	"dependencies": {
-		"body-parser": "^1.18.2",
+		"body-parser": "1.18.2",
 		"express": "4.16.2",
 		"http-auth": "3.2.3",
 		"pug": "2.0.0-rc.4"
