@@ -2,7 +2,7 @@ node_modules/
 package-lock.json
 npm-debug.log
 
-secret/config.json
+config.yaml
 secret/users.htpasswd
 
 api-sources/

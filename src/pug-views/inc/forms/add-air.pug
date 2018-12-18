@@ -1,0 +1,40 @@
+fieldset.add-air
+	legend Добавление нового эфира
+
+	p
+		label(for='time_start') Время начала:
+		input#time_start(type='datetime-local' value='2016-05-06T00:00' required)
+		br
+		em.text-m-m Время должно быть московским.
+
+	p
+		label(for='duration') Продолжительность:
+		input#duration(type='number' min='1' placeholder='60')
+		label(for='duration') мин.
+		br
+		em.text-m-m Необязательно, стандартное время эфира &ndash; 1 час.
+
+	p
+		label(for='title') Название:
+		input#title(type='text'  placeholder='Binan Koukou Chikyuu Bouei-bu LOVE! (1-2 NEW)' required)
+
+	p
+		label(for='link') Ссылка:
+		input#link(name='link' type='text' placeholder='https://shikimori.org/animes/1639')
+		br
+		em.text-m-m Необязательно, но желательно.
+
+	p(style='display: none')
+		label(for='secret') Эфир секретный?
+		input#secret(type='checkbox')
+		br
+		em.text-m-m Не будет отображаться в расписании, удалить его также будет нельзя.
+
+	p.add-air-as-backup
+		label(for='backup') Эфир на запасном потоке?
+		input#backup(name='air_is_backup' type='checkbox')
+		br
+
+	p.submit
+		button(type='submit' name='method' value='add_air') Добавить эфир!
+		label #[i.text-m Внимательно проверьте введённые данные!]

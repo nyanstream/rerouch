@@ -1,44 +1,42 @@
 'use strict'
 
+process.env.TZ = 'Europe/Moscow'
+
+
+const project = require('./package.json')
+
+global._app = {}
+
+const auth = require('http-auth')
+
+const path = require('path')
+
+const fs = require('fs')
+
+let parseYAML = require('js-yaml')
+
+let parseYAMLfile = fileName => parseYAML.load(fs.readFileSync(`./${fileName}.yaml`, 'utf8'))
+
 /*
- * Сделать создание полной конфигурации приложения при первой загрузке
+ * TODO: Сделать создание полной конфигурации приложения при первой загрузке
  */
 
 try {
-	const config = require('./secret/config.json')
+	let config = parseYAMLfile('config')
+	global._app.config = config
 } catch (e) {
-	console.log('Не найден файл с конфигурацией приложения (config.json). Необходимо создать его.')
+	console.log('Не найден файл с конфигурацией приложения (config.yaml). Необходимо создать его.')
+	console.log(e)
 	process.exit()
 }
 
-process.env.TZ = 'Europe/Moscow'
+global._app.rootDir = __dirname
 
-const
-	project =  require('./package.json'),
-	config =   require('./secret/config.json')
-
-const
-	express =     require('express'),
-	bodyParser =  require('body-parser'),
-	auth =        require('http-auth'),
-	path =        require('path'),
-	fs =          require('fs')
+const config = global._app.config
 
 const PORT = process.env.PORT || 5000
 
-const authBasic = auth.basic({
-	realm: 'API@nyan.stream',
-	file: path.join(`${__dirname}/secret/`, 'users.htpasswd')
-})
-
-const server = express()
-
-server.use(express.static(path.join(__dirname, 'public')))
-
-server.use(bodyParser.urlencoded({ extended: true }))
-
-server.set('view engine', 'pug')
-server.set('views', path.join(__dirname, 'views'))
+const server = require('./src/js-modules/express-server-init')
 
 server.get('/', (req, res) => {
 	res.render('index')
@@ -48,22 +46,52 @@ server.get('/api/:apiID', (req, res) => {
 	res.set({
 		'Access-Control-Allow-Origin': '*'
 	})
+
 	res.sendFile(`${req.params.apiID}.json`, {
-		root : `${__dirname}/api-sources/`
+		root : `${__dirname}/${config.paths.api}/`
 	})
 })
 
-server.all(`/${config.panel_path}`, auth.connect(authBasic), (req, res, next) => {
+const authBasic = auth.basic({
+	realm: 'PANEL@NYAN.STREAM',
+	file: path.join(`${__dirname}/${config.paths.secret}/`, 'users.htpasswd')
+})
+
+server.all(`/${config.paths.panel}`, auth.connect(authBasic), (req, res, next) => {
 	next()
 })
 
-server.get(`/${config.panel_path}`, (req, res) => {
-	let panelMode = 'moder'
-	if (config.admins && config.admins.includes(req.user)) {
-		panelMode = 'admin'
+server.get(`/${config.paths.panel}`, (req, res) => {
+	let currentUser = req.user in config.users
+		? config.users[req.user]
+		: false
+
+	if (!currentUser) {
+		res.status(403).send('Вашего аккаунта нет в списке пользователей.')
 	}
 
-	let panelData = { sched: {}, noti: {} }
+	let panelMode =
+		('isAdmin' in currentUser && currentUser.isAdmin)
+			? 'admin'
+			: 'regular'
+
+	res.render('panel', {
+		PANEL: {
+			mode: panelMode
+		}
+	})
+})
+
+server.get(`/123${config.paths.panel}`, (req, res) => {
+	let panelMode = 'moder'
+
+	if (
+		config.users &&
+		'admin' in Object.keys(config.users)[req.user] &&
+		Object.keys(config.users)[req.user]['admin'] == true
+	) {
+		panelMode = 'admin'
+	}
 
 	let filesData = {
 		crude: { sched: [], noti: {} },
@@ -75,7 +103,7 @@ server.get(`/${config.panel_path}`, (req, res) => {
 	}
 
 	Object.keys(filesData.crude).forEach(file => {
-		let filePath = path.join(`${__dirname}/api-sources/`, `${file}.json`)
+		let filePath = path.join(`${__dirname}/${config.paths.api}/`, `${file}.json`)
 		filesData.crude[file] = JSON.parse(fs.readFileSync(filePath, 'utf8'))
 	})
 
@@ -93,6 +121,8 @@ server.get(`/${config.panel_path}`, (req, res) => {
 		}
 	}
 
+	let panelData = { sched: {}, noti: {}, vk: {} }
+
 	panelData.sched = {
 		count: {
 			main: filesData.count.main.sched,
@@ -104,11 +134,16 @@ server.get(`/${config.panel_path}`, (req, res) => {
 		panelData.sched.latest = filesData.tmp.sched[filesData.count.main.sched - 1]
 	}
 
-	panelData.noti = (panelMode == 'admin')
-	? filesData.crude.noti
-	: {}
+	panelData.noti =
+		(panelMode == 'admin')
+			? filesData.crude.noti
+			: {}
 
-	res.render('panel', { mode: panelMode, user: req.user, init_data: JSON.stringify(panelData) })
+	// res.render('panel.pug', {
+	// 	mode: panelMode,
+	// 	user: req.user,
+	// 	init_data: JSON.stringify(panelData)
+	// })
 })
 
 server.post(`/${config.panel_path}`, (req, res) => {
@@ -117,19 +152,16 @@ server.post(`/${config.panel_path}`, (req, res) => {
 
 server.listen(PORT, () => console.log(`Сервер запущен на порту ${PORT}`))
 
-server.use((err, req, res, next) => {
-	res.status(404).send('ААА! ОШИБКА СТОП 0000000')
-})
-
 const neededFiles = {
 	api: ['sched', 'noti'],
 	htpasswd: ['users']
 }
 
 neededFiles.api.forEach(file => {
-	let filePath = path.join(`${__dirname}/api-sources/`, `${file}.json`)
+	let filePath = path.join(`${__dirname}/${config.paths.api}/`, `${file}.json`)
 	fs.readFile(filePath, { encoding: 'utf-8' }, error => {
 		let newFileContent = []
+
 		if (file == 'noti') {
 			newFileContent = { enabled: false }
 		}
@@ -143,7 +175,8 @@ neededFiles.api.forEach(file => {
 })
 
 neededFiles.htpasswd.forEach(file => {
-	let filePath = path.join(`${__dirname}/secret/`, `${file}.htpasswd`)
+	let filePath = path.join(`${__dirname}/${config.paths.secret}/`, `${file}.htpasswd`)
+
 	fs.readFile(filePath, { encoding: 'utf-8' }, error => {
 		let newFileContent = ''
 

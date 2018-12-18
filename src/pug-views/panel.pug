@@ -1,0 +1,29 @@
+doctype html
+html(lang='ru')
+	head
+		meta(charset='utf-8')
+		title NYAN.STREAM / API-панель
+
+		link(rel='shortcut icon' href='https://favicon.yandex.net/favicon/nyan.stream')
+
+		link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:400,500&amp;subset=cyrillic')
+
+		link(rel='stylesheet' href='/assets/panel.css')
+
+	body
+
+		header.header #{PANEL.mode}
+
+		main.panel
+			form(method='post')
+				include inc/forms/add-air.pug
+			form(method='post')
+				include inc/forms/rm-air.pug
+
+			if mode == 'admin'
+				form(method='post')
+					include inc/forms/expired-clear.pug
+				form(method='post')
+					include inc/forms/noti.pug
+
+		footer.footer
