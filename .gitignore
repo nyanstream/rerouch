@@ -5,4 +5,6 @@ npm-debug.log
 config.yaml
 secret/users.htpasswd
 
+ssl/
+
 api-sources/

@@ -2,12 +2,13 @@
 
 process.env.TZ = 'Europe/Moscow'
 
-
 const project = require('./package.json')
 
 global._app = {}
 
 const auth = require('http-auth')
+
+const https = require('https')
 
 const path = require('path')
 
@@ -36,13 +37,13 @@ const config = global._app.config
 
 const PORT = process.env.PORT || 5000
 
-const server = require('./src/js-modules/express-server-init')
+const expressServer = require('./src/js-modules/express-server-init')
 
-server.get('/', (req, res) => {
+expressServer.get('/', (req, res) => {
 	res.render('index')
 })
 
-server.get('/api/:apiID', (req, res) => {
+expressServer.get('/api/:apiID', (req, res) => {
 	res.set({
 		'Access-Control-Allow-Origin': '*'
 	})
@@ -57,11 +58,11 @@ const authBasic = auth.basic({
 	file: path.join(`${__dirname}/${config.paths.secret}/`, 'users.htpasswd')
 })
 
-server.all(`/${config.paths.panel}`, auth.connect(authBasic), (req, res, next) => {
+expressServer.all(`/${config.paths.panel}`, auth.connect(authBasic), (req, res, next) => {
 	next()
 })
 
-server.get(`/${config.paths.panel}`, (req, res) => {
+expressServer.get(`/${config.paths.panel}`, (req, res) => {
 	let currentUser = req.user in config.users
 		? config.users[req.user]
 		: false
@@ -82,7 +83,7 @@ server.get(`/${config.paths.panel}`, (req, res) => {
 	})
 })
 
-server.get(`/123${config.paths.panel}`, (req, res) => {
+expressServer.get(`/123${config.paths.panel}`, (req, res) => {
 	let panelMode = 'moder'
 
 	if (
@@ -146,11 +147,31 @@ server.get(`/123${config.paths.panel}`, (req, res) => {
 	// })
 })
 
-server.post(`/${config.panel_path}`, (req, res) => {
+expressServer.post(`/${config.panel_path}`, (req, res) => {
 	res.send('OK.')
 })
 
-server.listen(PORT, () => console.log(`Сервер запущен на порту ${PORT}`))
+const server = https.createServer({
+	cert: fs.readFileSync(config.paths.https.cert),
+	key: fs.readFileSync(config.paths.https.key),
+	//-ca: fs.readFileSync(config.paths.https.ca)
+}, expressServer)
+
+const WSServer = require('./src/js-modules/ws-server-init')
+
+server.on('upgrade', (request, socket, head) => {
+	if (request.url == '/wss') {
+		WSServer.handleUpgrade(request, socket, head, (ws) => {
+			WSServer.emit('connection', ws, request)
+		})
+	} else {
+		socket.destroy()
+	}
+})
+
+server.listen(8443, () => {
+	console.log(`Сервер запущен.`)
+})
 
 const neededFiles = {
 	api: ['sched', 'noti'],
@@ -159,6 +180,7 @@ const neededFiles = {
 
 neededFiles.api.forEach(file => {
 	let filePath = path.join(`${__dirname}/${config.paths.api}/`, `${file}.json`)
+
 	fs.readFile(filePath, { encoding: 'utf-8' }, error => {
 		let newFileContent = []
 

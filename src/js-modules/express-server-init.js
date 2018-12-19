@@ -14,6 +14,8 @@ const config = global._app.config
 
 const _appRootDir = global._app.rootDir
 
+server.enable('trust proxy')
+
 server.use(
 	sassMiddleware({
 		src: `${_appRootDir}/${config.paths.dev.css}`,
@@ -42,6 +44,6 @@ server.use((err, req, res, next) => {
 })
 
 server.set('view engine', 'pug')
-server.set('views', path.join(_appRootDir, config.paths.views))
+server.set('views', path.join(_appRootDir, config.paths.dev.views))
 
 module.exports = server
