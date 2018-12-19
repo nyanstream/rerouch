@@ -16,23 +16,39 @@ const _appRootDir = global._app.rootDir
 
 server.enable('trust proxy')
 
+let assetsPath = path.join(
+	config.paths.public,
+	config.paths.public_assets
+)
+
+let cssPath = path.join(
+	assetsPath,
+	config.paths.public_assets_css
+)
+
+let cssPathPrefix = cssPath
+	.substring((config.paths.public).length)
+	.replace(/\\/g, '/')
+
 server.use(
 	sassMiddleware({
-		src: `${_appRootDir}/${config.paths.dev.css}`,
-		dest: `${_appRootDir}/${config.paths.public_assets}/css`,
-		prefix: '/css',
+		root: _appRootDir,
+		src: config.paths.dev.css,
+		dest: cssPath,
+		prefix: cssPathPrefix,
 		outputStyle: 'compressed',
+		//debug: true,
 	})
+)
+
+server.use(
+	bodyParser.urlencoded({ extended: true })
 )
 
 server.use(
 	express.static(
 		path.join(_appRootDir, config.paths.public)
 	)
-)
-
-server.use(
-	bodyParser.urlencoded({ extended: true })
 )
 
 server.use((err, req, res, next) => {

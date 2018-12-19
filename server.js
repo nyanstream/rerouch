@@ -35,9 +35,21 @@ global._app.rootDir = __dirname
 
 const config = global._app.config
 
+let neededFilesCheck = require('./src/server-modules/needed-files-check')()
+
+void(() => {
+	// TODO: fs.stat()
+	let kaminaPath = path.dirname(require.resolve('kamina-js/package.json'))
+
+	fs.copyFileSync(
+		`${kaminaPath}/dist/kamina.min.js`,
+		`${__dirname}/src/js/vendors/kamina.min.js`
+	)
+})()
+
 const PORT = process.env.PORT || 5000
 
-const expressServer = require('./src/js-modules/express-server-init')
+const expressServer = require('./src/server-modules/express-server-init')
 
 expressServer.get('/', (req, res) => {
 	res.render('index')
@@ -49,7 +61,13 @@ expressServer.get('/api/:apiID', (req, res) => {
 	})
 
 	res.sendFile(`${req.params.apiID}.json`, {
-		root : `${__dirname}/${config.paths.api}/`
+		root: `${__dirname}/${config.paths.api}/`
+	})
+})
+
+expressServer.get(`/assets/js/:fileName`, (req, res) => {
+	res.sendFile(req.params.fileName, {
+		root: `${__dirname}/src/js/`
 	})
 })
 
@@ -69,17 +87,27 @@ expressServer.get(`/${config.paths.panel}`, (req, res) => {
 
 	if (!currentUser) {
 		res.status(403).send('Вашего аккаунта нет в списке пользователей.')
+		res.end();
+
+		return
 	}
 
-	let panelMode =
+	let userStatus =
 		('isAdmin' in currentUser && currentUser.isAdmin)
 			? 'admin'
 			: 'regular'
 
 	res.render('panel', {
+		VERSION: project.version,
+
 		PANEL: {
-			mode: panelMode
-		}
+			user: {
+				name: currentUser.userName,
+				status: userStatus
+			}
+		},
+
+		LIBS: config.vendors
 	})
 })
 
@@ -157,7 +185,7 @@ const server = https.createServer({
 	//-ca: fs.readFileSync(config.paths.https.ca)
 }, expressServer)
 
-const WSServer = require('./src/js-modules/ws-server-init')
+const WSServer = require('./src/server-modules/ws-server-init')
 
 server.on('upgrade', (request, socket, head) => {
 	if (request.url == '/wss') {
@@ -171,41 +199,4 @@ server.on('upgrade', (request, socket, head) => {
 
 server.listen(8443, () => {
 	console.log(`Сервер запущен.`)
-})
-
-const neededFiles = {
-	api: ['sched', 'noti'],
-	htpasswd: ['users']
-}
-
-neededFiles.api.forEach(file => {
-	let filePath = path.join(`${__dirname}/${config.paths.api}/`, `${file}.json`)
-
-	fs.readFile(filePath, { encoding: 'utf-8' }, error => {
-		let newFileContent = []
-
-		if (file == 'noti') {
-			newFileContent = { enabled: false }
-		}
-
-		if (error && error.code == 'ENOENT') {
-			fs.writeFile(filePath, JSON.stringify(newFileContent), () => {
-				console.log(`Файл "${file}.json" не найден и был создан.`)
-			})
-		}
-	})
-})
-
-neededFiles.htpasswd.forEach(file => {
-	let filePath = path.join(`${__dirname}/${config.paths.secret}/`, `${file}.htpasswd`)
-
-	fs.readFile(filePath, { encoding: 'utf-8' }, error => {
-		let newFileContent = ''
-
-		if (error && error.code == 'ENOENT') {
-			fs.writeFile(filePath, newFileContent.toString(), () => {
-				console.log(`Файл "${file}.htpasswd" не найден.  Создан пустой файл, но его необходимо заполнить.`)
-			})
-		}
-	})
 })

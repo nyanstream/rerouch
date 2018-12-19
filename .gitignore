@@ -7,4 +7,8 @@ secret/users.htpasswd
 
 ssl/
 
+public/assets/css/
+
+src/js/vendors
+
 api-sources/
