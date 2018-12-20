@@ -8,6 +8,10 @@ const sassMiddleware = require('node-sass-middleware')
 
 const path = require('path')
 
+const csp = require('helmet-csp')
+
+const uuidv4 = require('uuid/v4')
+
 const server = express()
 
 const config = global._app.config
@@ -40,6 +44,46 @@ server.use(
 		//debug: true,
 	})
 )
+
+server.use((req, res, next) => {
+	res.locals.nonce = uuidv4()
+	next()
+})
+
+server.use(csp({
+	directives: {
+		defaultSrc: ["'self'"],
+
+		scriptSrc: [
+			"'self'",
+			"https://cdnjs.cloudflare.com",
+			(req, res) => `'nonce-${res.locals.nonce}'`,
+		],
+
+		styleSrc: [
+			"'self'",
+			"https://fonts.googleapis.com",
+		],
+
+		fontSrc: [
+			"'self'",
+			'https://fonts.gstatic.com',
+		],
+
+		imgSrc: [
+			"'self'",
+			"data:",
+			"https://nyan.stream",
+			"https://favicon.yandex.net",
+		],
+
+		frameAncestors: ["'self'"],
+
+		blockAllMixedContent: true,
+	}
+}))
+
+server.disable('x-powered-by')
 
 server.use(
 	bodyParser.urlencoded({ extended: true })

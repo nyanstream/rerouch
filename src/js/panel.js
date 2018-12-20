@@ -26,16 +26,16 @@ var initAdminPanel = (data = {}) => {
 		let infoEl = $make.qs('.rm-air .info')
 
 		let emptySched = {
-			anime: (infoEl && data.sched.count == 0) ? true : false
+			anime: (infoEl && data.sched.count == 0)
 		}
 
 		infoEl.innerHTML = (data.sched.count > 0 && infoEl)
 			? `Название: <q>${data.sched.latest.title}</q>. Начало ${moment.unix(data.sched.latest.start).format('LLL')}; Конец: ${moment.unix(data.sched.latest.end).format('LLL')}`
 			: 'Расписание пустое'
 
-		let
-			schedsNames = Object.keys(emptySched),
-			emptyScheds = schedsNames.filter(key => emptySched[key] == true)
+		let schedsNames = Object.keys(emptySched)
+
+		let emptyScheds = schedsNames.filter(key => emptySched[key] == true)
 
 		if (schedsNames.length == emptyScheds.length) {
 			Array.from($make.qs('.rm-air input', ['a'])).forEach(input => {
@@ -64,46 +64,59 @@ var initAdminPanel = (data = {}) => {
 		let vkLink = $make.qs('.vk-link p')
 		if (!vkLink) { throw 42 }
 
-		vkLink.appendChild($create.link(`${data.vk.URL}?client_id=${data.vk.appID}&display=page&redirect_uri=https://${data.server}/${data.vk.api}&scope=video,offline&response_type=code&state=vk-get-code`, 'Просто нажми сюда', '', ['e']))
+		vkLink.appendChild(
+			$create.link(
+				`${data.vk.URL}?client_id=${data.vk.appID}&display=page&redirect_uri=https://${data.server}/${data.vk.api}&scope=video,offline&response_type=code&state=vk-get-code`,
+				'Просто нажми сюда',
+				'',
+				['e']
+			)
+		)
 	} catch (e) { }
 
 	try {
 		if (!$make.qs('.noti')) { throw 42 }
 
-		let
-			notiCreateF =        $make.qs('.noti input#noti_text'),
-			notiCreateC =        $make.qs('.noti input#noti_color'),
-			notiSubmitBtn =      $make.qs('.noti input[type="submit"]'),
-			notiSubmitBtnText =  'Создать'
+		let notiInputTest = $make.qs('.noti input#noti_text')
+
+		let notiInputColor = $make.qs('.noti input#noti_color')
+
+		let notiSubmitBtn = $make.qs('.noti input[type="submit"]')
+
+		let notiSubmitBtnText =  'Создать'
+
+		let notiTextElem = $make.qs('.noti .noti-text')
+
+		let notiTextElemContent = $make.qsf('samp', notiTextElem)
 
 		if (data.noti.enabled == true) {
-			let
-				notiTextElemRoot = $make.qs('.noti .noti-text'),
-				notiTextElem = $create.elem('samp', data.noti.text, '', ['s']),
-				notiTextElemText = $create.text('Текущее оповещение: ')
+			notiTextElemContent.textContent = data.noti.text
 
 			if (data.noti.color) {
 				notiTextElem.style.backgroundColor = data.noti.color
 			}
 
-			notiTextElemRoot.appendChild(notiTextElemText)
-			notiTextElemRoot.appendChild(notiTextElem)
-
 			notiSubmitBtn.value = 'Заменить'
 			notiSubmitBtnText = 'Заменить'
+		} else {
+			notiTextElemContent.textContent = 'Оповещения нет'
 		}
 
 		$make.qs('.noti input#noti_rm').addEventListener('change', e => {
 			let _this = e.target
 
 			if (_this.checked) {
-				notiCreateF.setAttribute('disabled', '')
-				notiCreateC.setAttribute('disabled', '')
-				notiCreateF.value = ''
+				notiInputTest.setAttribute('disabled', '')
+				notiInputColor.setAttribute('disabled', '')
+				notiInputTest.value = ''
 				notiSubmitBtn.value = 'Удалить'
-			} else if (!_this.checked && notiCreateF.hasAttribute('disabled') && notiCreateC.hasAttribute('disabled')) {
-				notiCreateF.removeAttribute('disabled')
-				notiCreateC.removeAttribute('disabled', '')
+			} else if (
+				!_this.checked &&
+				notiInputTest.hasAttribute('disabled') &&
+				notiInputColor.hasAttribute('disabled')
+			) {
+				notiInputTest.removeAttribute('disabled')
+				notiInputColor.removeAttribute('disabled', '')
 				notiSubmitBtn.value = notiSubmitBtnText
 			}
 		})

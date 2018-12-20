@@ -8,7 +8,7 @@ global._app = {}
 
 const auth = require('http-auth')
 
-const https = require('https')
+const http = require('spdy')
 
 const path = require('path')
 
@@ -16,7 +16,10 @@ const fs = require('fs')
 
 let parseYAML = require('js-yaml')
 
-let parseYAMLfile = fileName => parseYAML.load(fs.readFileSync(`./${fileName}.yaml`, 'utf8'))
+let parseYAMLfile = fileName =>
+	parseYAML.load(
+		fs.readFileSync(`./${fileName}.yaml`, 'utf8')
+	)
 
 /*
  * TODO: Сделать создание полной конфигурации приложения при первой загрузке
@@ -41,10 +44,10 @@ void(() => {
 	// TODO: fs.stat()
 	let kaminaPath = path.dirname(require.resolve('kamina-js/package.json'))
 
-	fs.copyFileSync(
-		`${kaminaPath}/dist/kamina.min.js`,
-		`${__dirname}/src/js/vendors/kamina.min.js`
-	)
+	// fs.copyFileSync(
+	// 	`${kaminaPath}/dist/kamina.min.js`,
+	// 	`${__dirname}/src/js/vendors/kamina.min.js`
+	// )
 })()
 
 const PORT = process.env.PORT || 5000
@@ -107,79 +110,85 @@ expressServer.get(`/${config.paths.panel}`, (req, res) => {
 			}
 		},
 
-		LIBS: config.vendors
+		LIBS: config.vendors,
+
+		NONCE: res.locals.nonce,
 	})
 })
 
-expressServer.get(`/123${config.paths.panel}`, (req, res) => {
-	let panelMode = 'moder'
-
-	if (
-		config.users &&
-		'admin' in Object.keys(config.users)[req.user] &&
-		Object.keys(config.users)[req.user]['admin'] == true
-	) {
-		panelMode = 'admin'
-	}
-
-	let filesData = {
-		crude: { sched: [], noti: {} },
-		tmp: { sched: [] },
-		count: {
-			main: { sched: 0 },
-			exprs: { sched: 0 }
-		}
-	}
-
-	Object.keys(filesData.crude).forEach(file => {
-		let filePath = path.join(`${__dirname}/${config.paths.api}/`, `${file}.json`)
-		filesData.crude[file] = JSON.parse(fs.readFileSync(filePath, 'utf8'))
-	})
-
-	for (let item of filesData.crude.sched) {
-		if (!item.secret || item.secret != true) {
-			filesData.tmp.sched.push(item)
-		}
-	}
-
-	filesData.count.main.sched = filesData.tmp.sched.length
-
-	for (let item of filesData.tmp.sched) {
-		if (item.e < (Date.now() / 1000)) {
-			filesData.count.exprs.sched++
-		}
-	}
-
-	let panelData = { sched: {}, noti: {}, vk: {} }
-
-	panelData.sched = {
-		count: {
-			main: filesData.count.main.sched,
-			exprs: filesData.count.exprs.sched
-		}
-	}
-
-	if (filesData.count.main.sched != 0) {
-		panelData.sched.latest = filesData.tmp.sched[filesData.count.main.sched - 1]
-	}
-
-	panelData.noti =
-		(panelMode == 'admin')
-			? filesData.crude.noti
-			: {}
-
-	// res.render('panel.pug', {
-	// 	mode: panelMode,
-	// 	user: req.user,
-	// 	init_data: JSON.stringify(panelData)
-	// })
+expressServer.post(`/${config.paths.panel}`, (req, res) => {
+	console.log(res)
 })
+
+// expressServer.get(`/${config.paths.panel}`, (req, res) => {
+// 	let panelMode = 'moder'
+
+// 	if (
+// 		config.users &&
+// 		'admin' in Object.keys(config.users)[req.user] &&
+// 		Object.keys(config.users)[req.user]['admin'] == true
+// 	) {
+// 		panelMode = 'admin'
+// 	}
+
+// 	let filesData = {
+// 		crude: { sched: [], noti: {} },
+// 		tmp: { sched: [] },
+// 		count: {
+// 			main: { sched: 0 },
+// 			exprs: { sched: 0 }
+// 		}
+// 	}
+
+// 	Object.keys(filesData.crude).forEach(file => {
+// 		let filePath = path.join(`${__dirname}/${config.paths.api}/`, `${file}.json`)
+// 		filesData.crude[file] = JSON.parse(fs.readFileSync(filePath, 'utf8'))
+// 	})
+
+// 	for (let item of filesData.crude.sched) {
+// 		if (!item.secret || item.secret != true) {
+// 			filesData.tmp.sched.push(item)
+// 		}
+// 	}
+
+// 	filesData.count.main.sched = filesData.tmp.sched.length
+
+// 	for (let item of filesData.tmp.sched) {
+// 		if (item.e < (Date.now() / 1000)) {
+// 			filesData.count.exprs.sched++
+// 		}
+// 	}
+
+// 	let panelData = { sched: {}, noti: {}, vk: {} }
+
+// 	panelData.sched = {
+// 		count: {
+// 			main: filesData.count.main.sched,
+// 			exprs: filesData.count.exprs.sched
+// 		}
+// 	}
+
+// 	if (filesData.count.main.sched != 0) {
+// 		panelData.sched.latest = filesData.tmp.sched[filesData.count.main.sched - 1]
+// 	}
+
+// 	panelData.noti =
+// 		(panelMode == 'admin')
+// 			? filesData.crude.noti
+// 			: {}
+
+// 	res.render('panel.pug', {
+// 		mode: panelMode,
+// 		user: req.user,
+// 		init_data: JSON.stringify(panelData)
+// 	})
+// })
 
 expressServer.post(`/${config.panel_path}`, (req, res) => {
 	res.send('OK.')
 })
 
-const server = https.createServer({
+const server = http.createServer({
 	cert: fs.readFileSync(config.paths.https.cert),
 	key: fs.readFileSync(config.paths.https.key),
 	//-ca: fs.readFileSync(config.paths.https.ca)
@@ -197,6 +206,11 @@ server.on('upgrade', (request, socket, head) => {
 	}
 })
 
-server.listen(8443, () => {
+server.listen(8443, (err) => {
+	if (err) {
+		console.log(err)
+		throw new Error(err);
+	}
+
 	console.log(`Сервер запущен.`)
 })

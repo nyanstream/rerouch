@@ -20,14 +20,20 @@ html(lang='ru')
 
 			form(method='post')
 				include inc/forms/add-air.pug
+
 			form(method='post')
 				include inc/forms/rm-air.pug
 
 			if PANEL.user.status == 'admin'
 				form(method='post')
 					include inc/forms/expired-clear.pug
+
 				form(method='post')
 					include inc/forms/noti.pug
+
+				fieldset.vk-link
+					legend Обновление токена доступа ВК
+					p
 
 		footer.footer
 			p Панель управления API v#{VERSION}
@@ -41,3 +47,5 @@ html(lang='ru')
 				script(src=`https://cdnjs.cloudflare.com/ajax/libs/${JS.file}` integrity=`${JS.sri}` crossorigin='anonymous' defer)
 
 		script(src='/assets/js/panel.js' defer)
+
+		script(nonce=`${NONCE}`) document.addEventListener('DOMContentLoaded', () => { console.log('test') })
