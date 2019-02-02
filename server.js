@@ -44,13 +44,19 @@ void(() => {
 	// TODO: fs.stat()
 	let kaminaPath = path.dirname(require.resolve('kamina-js/package.json'))
 
-	// fs.copyFileSync(
-	// 	`${kaminaPath}/dist/kamina.min.js`,
-	// 	`${__dirname}/src/js/vendors/kamina.min.js`
-	// )
+	let vendorsPath = `${__dirname}/public/assets/js/vendors/`
+
+	console.log(vendorsPath)
+
+	if (!fs.existsSync(vendorsPath)) { fs.mkdirSync(vendorsPath) }
+
+	fs.copyFileSync(
+		`${kaminaPath}/dist/kamina.min.js`,
+		`${vendorsPath}/kamina.min.js`
+	)
 })()
 
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 8433
 
 const expressServer = require('./src/server-modules/express-server-init')
 
@@ -206,7 +212,7 @@ server.on('upgrade', (request, socket, head) => {
 	}
 })
 
-server.listen(8443, (err) => {
+server.listen(PORT, (err) => {
 	if (err) {
 		console.log(err)
 		throw new Error(err);

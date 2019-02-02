@@ -1,8 +1,23 @@
 'use strict'
 
 var initAdminPanel = (data = {}) => {
+	let resetForms = () => {
+		$make.qs('form', ['a'])
+			.forEach(form => { form.reset() })
+	}
+
+	resetForms()
+
 	$make.qs('form', ['a'])
-		.forEach(form => { form.reset() })
+		.forEach(form => {
+			console.log(form)
+
+			form.addEventListener('submit', e => {
+				e.preventDefault()
+
+				console.log(e)
+			})
+		})
 
 	try {
 		moment.tz.setDefault(data.timezone)

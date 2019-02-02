@@ -1,13 +1,13 @@
 {
 	"name": "rerouch",
 	"description": "NYAN.STREAM API (development prototype, not ready)",
-	"version": "0.0.5",
+	"version": "0.0.6",
 	"author": "Dmitry <dmitry@cojam.ru> (https://e965.ru)",
 	"private": true,
 	"repository": "github:nyanstream/rerouch",
 	"license": "MIT",
 	"engines": {
-		"node": ">= 10.11.0",
+		"node": ">= 10.12.1",
 		"npm": ">= 6.4.1"
 	},
 	"main": "server.js",
@@ -19,12 +19,12 @@
 		"express": "4.16.4",
 		"helmet-csp": "2.7.1",
 		"http-auth": "3.2.3",
-		"js-yaml": "3.12.0",
+		"js-yaml": "3.12.1",
 		"kamina-js": "1.3.1",
 		"node-sass-middleware": "0.11.0",
 		"pug": "2.0.3",
-		"spdy": "^4.0.0",
-		"uuid": "^3.3.2",
+		"spdy": "4.0.0",
+		"uuid": "3.3.2",
 		"ws": "6.1.2"
 	}
 }
