@@ -44,15 +44,17 @@ void(() => {
 	// TODO: fs.stat()
 	let kaminaPath = path.dirname(require.resolve('kamina-js/package.json'))
 
-	let vendorsPath = `${__dirname}/public/assets/js/vendors/`
+	let jsPath = path.normalize(`${__dirname}/${config.paths.public}/${config.paths.public_assets}/js/`)
 
-	console.log(vendorsPath)
+	let vendorsPath = path.join(jsPath, 'vendors')
+
+	if (!fs.existsSync(jsPath)) { fs.mkdirSync(jsPath) }
 
 	if (!fs.existsSync(vendorsPath)) { fs.mkdirSync(vendorsPath) }
 
 	fs.copyFileSync(
-		`${kaminaPath}/dist/kamina.min.js`,
-		`${vendorsPath}/kamina.min.js`
+		path.normalize(`${kaminaPath}/dist/kamina.min.js`),
+		path.normalize(`${vendorsPath}/kamina.min.js`)
 	)
 })()
 
@@ -70,13 +72,13 @@ expressServer.get('/api/:apiID', (req, res) => {
 	})
 
 	res.sendFile(`${req.params.apiID}.json`, {
-		root: `${__dirname}/${config.paths.api}/`
+		root: path.normalize(`${__dirname}/${config.paths.api}/`)
 	})
 })
 
-expressServer.get(`/assets/js/:fileName`, (req, res) => {
+expressServer.get(`/${config.paths.public_assets}/js/:fileName`, (req, res) => {
 	res.sendFile(req.params.fileName, {
-		root: `${__dirname}/src/js/`
+		root: path.normalize(`${__dirname}/src/js/`)
 	})
 })
 
