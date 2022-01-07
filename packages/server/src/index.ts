@@ -2,6 +2,7 @@ import CONFIG from './config.js';
 
 import server from './server/index.js';
 import { createMongoClient } from './db/common.js';
+import { clearOldSessions } from './db/sessions.js';
 
 try {
     console.log('Checking for required server config variables...');
@@ -39,3 +40,7 @@ server.listen(CONFIG.server.port, CONFIG.server.host, (err, address) => {
         process.exit(1);
     }
 });
+
+setInterval(async () => {
+    await clearOldSessions();
+}, 10000);

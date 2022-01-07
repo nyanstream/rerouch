@@ -1,12 +1,14 @@
 import type { FastifyPluginAsync, FastifySchema } from 'fastify';
 
-import CONFIG from '../../config.js';
-import { getHashedPasswordData } from '../../utils/password.js';
+import { getHashedPasswordData } from '../../utils/crypto.js';
+import { getIsAuth } from '../../utils/check-auth.js';
 
 import { UserRoles } from '../../db/users.js';
 
 import { createUser as createDbUser } from '../../db/users.js';
 import { getUser, getUsers, getUsersCount } from '../../db/users.js';
+
+import { createSession } from '../../db/sessions.js';
 
 const createUser = async (username: string, password: string, roles: UserRoles[]) => {
     try {
@@ -49,13 +51,14 @@ const routes: FastifyPluginAsync = async (app, options) => {
 
         const usersCount = await getUsersCount();
 
-        if (usersCount === 0) {
-            const userId = await createUser(RequestBody.username, RequestBody.password, [UserRoles.user, UserRoles.admin]);
-
-            res.status(200).send({ id: userId });
-        } else {
+        if (usersCount > 0) {
             res.status(401).send();
+            return;
         }
+
+        const userId = await createUser(RequestBody.username, RequestBody.password, [UserRoles.user, UserRoles.admin]);
+
+        res.status(200).send({ id: userId });
     });
 
     const LoginSchema: FastifySchema = {
@@ -74,29 +77,48 @@ const routes: FastifyPluginAsync = async (app, options) => {
 
         const userInfo = await getUser({ user_name: RequestBody.username });
 
-        if (userInfo) {
-            const passwordData = getHashedPasswordData(RequestBody.password, userInfo.password_salt);
-
-            if (passwordData.hash === userInfo.password_hash) {
-                res.status(200).send();
-            } else {
-                res.status(401).send();
-            }
-        } else {
-            // if user not found
+        // if user not found
+        if (!userInfo) {
             res.status(404).send();
+            return;
         }
 
-        res.status(400).send();
+        const passwordData = getHashedPasswordData(RequestBody.password, userInfo.password_salt);
+
+        if (passwordData.hash !== userInfo.password_hash) {
+            res.status(401).send();
+            return;
+        }
+
+        const sessionData = await createSession(userInfo._id.toString());
+
+        res.cookie('authCookie', sessionData.data.cookie, {
+            expires: new Date(sessionData.data.auth_end_date),
+            httpOnly: true,
+            path: '/',
+            sameSite: true,
+            secure: true,
+        });
+
+        res.status(200).send();
     });
 
     app.head('/check', { schema: {} }, async (req, res) => {
-        res.status(401).send();
+        const isAuth = await getIsAuth(req.cookies);
+        const responseStatus = isAuth ? 200 : 401;
+
+        res.status(responseStatus).send();
     });
 
     app.get('/get-users', { schema: {} }, async (req, res) => {
-        const users = await getUsers();
-        res.status(200).send(users);
+        const isAuth = await getIsAuth(req.cookies);
+
+        if (isAuth) {
+            const users = await getUsers();
+            res.status(200).send(users);
+        }
+
+        res.status(401).send([]);
     });
 };
 

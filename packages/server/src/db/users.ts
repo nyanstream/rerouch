@@ -1,6 +1,6 @@
 import type { Filter } from 'mongodb';
 
-import { createMongoClient, ObjectId } from './common.js';
+import { createMongoClient } from './common.js';
 
 const USERS_COLLECTION = 'users';
 
@@ -41,6 +41,19 @@ export const createUser = async (userDocument: Omit<UserType, 'roles'>, roles: U
     }
 };
 
+export const getUser = async (filter: Filter<UserType>) => {
+    try {
+        await client.connect();
+
+        const users = client.db().collection<UserType>(USERS_COLLECTION);
+        const userInfo = await users.findOne(filter);
+
+        return userInfo;
+    } finally {
+        await client.close();
+    }
+};
+
 export const getUsers = async (filter: Filter<UserType> = {}) => {
     try {
         await client.connect();
@@ -62,19 +75,6 @@ export const getUsersCount = async (filter: Filter<UserType> = {}) => {
         const usersCount = await users.find(filter).count();
 
         return usersCount;
-    } finally {
-        await client.close();
-    }
-};
-
-export const getUser = async (filter: Filter<UserType>) => {
-    try {
-        await client.connect();
-
-        const users = client.db().collection<UserType>(USERS_COLLECTION);
-        const userInfo = await users.findOne(filter);
-
-        return userInfo;
     } finally {
         await client.close();
     }

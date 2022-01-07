@@ -1,4 +1,4 @@
-import { createHmac } from 'crypto';
+import { createHmac, createHash } from 'crypto';
 import { nanoid } from 'nanoid';
 
 import CONFIG from '../config.js';
@@ -11,7 +11,9 @@ type HashedPasswordData = {
 export const getHashedPasswordData = (password: string, existingSalt?: string) => {
     const salt = existingSalt ?? nanoid();
 
-    const hmac = createHmac('sha256', salt + CONFIG.password_salt);
+    const combinedSalt = `${CONFIG.password_salt}@${salt}`;
+
+    const hmac = createHmac('sha256', combinedSalt);
 
     const hash = hmac.update(password).digest('hex');
 
@@ -21,4 +23,14 @@ export const getHashedPasswordData = (password: string, existingSalt?: string) =
     };
 
     return data;
+};
+
+export const getSessionCookieValue = (userId: string, auth_date: string) => {
+    const hash = createHash('sha256');
+
+    const salt = `${userId}@${auth_date}`;
+
+    const value = hash.update(salt).digest('hex');
+
+    return value;
 };
