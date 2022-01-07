@@ -1,30 +1,43 @@
 {
-	"name": "rerouch",
-	"description": "NYAN.STREAM API (development prototype, not ready)",
-	"version": "0.0.7",
-	"author": "Dmitry <dmitry@cojam.ru> (https://e965.ru)",
-	"private": true,
-	"repository": "github:nyanstream/rerouch",
-	"license": "MIT",
-	"engines": {
-		"node": ">= 12.6.0",
-		"npm": ">= 6.9.0"
-	},
-	"main": "server.js",
-	"scripts": {
-		"start": "node server.js"
-	},
-	"dependencies": {
-		"body-parser": "1.19.0",
-		"express": "4.17.1",
-		"helmet-csp": "2.7.1",
-		"http-auth": "3.2.3",
-		"js-yaml": "3.13.1",
-		"kamina-js": "1.3.1",
-		"node-sass-middleware": "0.11.0",
-		"pug": "2.0.4",
-		"spdy": "4.0.0",
-		"uuid": "3.3.2",
-		"ws": "7.0.1"
-	}
+    "name": "@nyanstream/rerouch",
+    "version": "1.0.0",
+    "type": "module",
+    "private": true,
+    "author": "Dmitry <dmitry@cojam.ru> (https://e965.ru)",
+    "license": "MIT",
+    "repository": "https://github.com/nyanstream/rerouch.git",
+    "workspaces": [
+        "packages/*"
+    ],
+    "scripts": {
+        "prettier": "prettier --write **/*.{json,yml,md,js,ts,tsx}",
+        "lint-staged": "lint-staged",
+        "prepare": "is-ci || husky install",
+        "eslint": "eslint .",
+        "build:all": "npm run build --workspaces",
+        "copy-client-files": "ncp packages/client/dist/ packages/server/dist/client-files/",
+        "build:client": "npm run build -w packages/client",
+        "build:server": "npm run build -w packages/server",
+        "start:client": "npm start -w packages/client",
+        "start:server": "npm start -w packages/server",
+        "assemble": "npm run build:all && npm run copy-client-files"
+    },
+    "lint-staged": {
+        "*.{json,yml,md,js,ts,tsx}": [
+            "prettier --write"
+        ]
+    },
+    "devDependencies": {
+        "@types/node": "17.0.8",
+        "@typescript-eslint/eslint-plugin": "5.9.0",
+        "@typescript-eslint/parser": "5.9.0",
+        "del-cli": "4.0.1",
+        "eslint-config-prettier": "8.3.0",
+        "eslint-plugin-prettier": "4.0.0",
+        "husky": "7.0.4",
+        "is-ci": "3.0.1",
+        "lint-staged": "12.1.5",
+        "ncp": "2.0.0",
+        "prettier": "2.5.1"
+    }
 }
