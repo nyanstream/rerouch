@@ -6,7 +6,9 @@ import FastifyCookiePlugin from 'fastify-cookie';
 import FastifyStaticPlugin from 'fastify-static';
 import FastifySwaggerPlugin from 'fastify-swagger';
 
-import CONFIG from './config.js';
+import CONFIG from '../config.js';
+
+import { authRoutes } from './routes/index.js';
 
 const app = Fastify();
 
@@ -66,7 +68,7 @@ app.get('/robots.txt', { schema: { hide: true } }, async (req, res) => {
 
 // Routes
 
-// app.register(authRoutes, { prefix: '/api/auth' });
+app.register(authRoutes, { prefix: '/api/auth' });
 
 // app.register(sendFormRoutes, { prefix: '/api/send-form' });
 

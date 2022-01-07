@@ -10,7 +10,7 @@
     },
     "scripts": {
         "cleanup": "del-cli ./dist",
-        "esbuild": "esbuild src/index.ts --bundle --external:fastify-swagger,saslprep --format=esm --platform=node --outfile=dist/index.js",
+        "esbuild": "esbuild src/index.ts --bundle --minify --external:fastify-swagger,saslprep --format=esm --platform=node --outfile=dist/index.js",
         "copy-static-dir": "ncp src/static/ dist/static",
         "copy-package-dist-json": "ncp package-dist.json dist/package.json",
         "build": "npm run cleanup && npm run esbuild && npm run copy-static-dir && npm run copy-package-dist-json",
@@ -28,7 +28,8 @@
         "fastify-static": "4.5.0",
         "fastify-swagger": "4.13.0",
         "mongodb": "4.2.2",
-        "mongodb-client-encryption": "1.2.7"
+        "mongodb-client-encryption": "1.2.7",
+        "nanoid": "3.1.30"
     },
     "devDependencies": {
         "esbuild": "0.14.10",

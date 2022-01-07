@@ -28,6 +28,8 @@ export default {
         db_connection_string: process.env.DB_CONNECTION_STRING,
     },
 
+    password_salt: process.env.PASSWORD_SALT ?? '',
+
     API_KEYS: {
         recaptcha: process.env.API_RECAPTCHA_SERVER_KEY,
     },
