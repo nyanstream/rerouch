@@ -3,12 +3,14 @@ import ReactDOM from 'react-dom';
 
 import { HashRouter } from 'react-router-dom';
 
+import { App } from './components/App';
+
 import './main.scss';
 
 ReactDOM.render(
     <HashRouter>
         <React.StrictMode>
-            <>123</>
+            <App />
         </React.StrictMode>
     </HashRouter>,
     document.getElementById('root')
