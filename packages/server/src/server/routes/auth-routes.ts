@@ -2,66 +2,12 @@ import type { FastifyPluginAsync, FastifySchema } from 'fastify';
 
 import { getHashedPasswordData } from '../../utils/crypto.js';
 
-import { UserRoles } from '../../db/users.js';
-
-import { createUser as createDbUser } from '../../db/users.js';
-import { getUser, getUsers, getUsersCount } from '../../db/users.js';
-
-import { createSession } from '../../db/sessions.js';
+import { getUser } from '../../db/users.js';
+import { createSession, deleteSessions } from '../../db/sessions.js';
 
 import type { LoginQueryParamsType } from './auth-routes.types.js';
 
-const createUser = async (username: string, password: string, roles: UserRoles[]) => {
-    try {
-        const passwordData = getHashedPasswordData(password);
-
-        const userId = await createDbUser(
-            {
-                user_name: username,
-                password_hash: passwordData.hash,
-                password_salt: passwordData.salt,
-            },
-            roles
-        );
-
-        return userId;
-    } catch (err) {
-        console.warn(err);
-    }
-};
-
 const routes: FastifyPluginAsync = async (app, options) => {
-    const CreateAdminUserSchema: FastifySchema = {
-        querystring: {
-            type: 'object',
-            required: ['username', 'password'],
-            properties: {
-                username: { type: 'string' },
-                password: { type: 'string' },
-            },
-        },
-        response: {
-            200: {
-                id: { type: 'string' },
-            },
-        },
-    };
-
-    app.post('/create-admin-user-if-no-one-exists', { schema: CreateAdminUserSchema }, async (req, res) => {
-        const RequestBody = req.query as Omit<LoginQueryParamsType, 'captcha'>;
-
-        const usersCount = await getUsersCount();
-
-        if (usersCount > 0) {
-            res.status(401).send();
-            return;
-        }
-
-        const userId = await createUser(RequestBody.username, RequestBody.password, [UserRoles.user, UserRoles.admin]);
-
-        res.status(200).send({ id: userId });
-    });
-
     const LoginSchema: FastifySchema = {
         body: {
             type: 'object',
@@ -105,6 +51,23 @@ const routes: FastifyPluginAsync = async (app, options) => {
         res.status(200).send();
     });
 
+    app.post(
+        '/logout',
+        {
+            schema: {},
+            preHandler: app.auth([(app as any).verifySession]),
+        },
+        async (req, res) => {
+            const authCookie = req.cookies['authCookie'];
+
+            await deleteSessions({ cookie: authCookie });
+
+            res.clearCookie('authCookie');
+
+            res.status(200).send();
+        }
+    );
+
     app.head(
         '/check',
         {
@@ -113,18 +76,6 @@ const routes: FastifyPluginAsync = async (app, options) => {
         },
         async (req, res) => {
             res.status(200).send();
-        }
-    );
-
-    app.get(
-        '/get-users',
-        {
-            schema: {},
-            preHandler: app.auth([(app as any).verifyAdminUserSession]),
-        },
-        async (req, res) => {
-            const users = await getUsers();
-            res.status(200).send(users ?? []);
         }
     );
 };

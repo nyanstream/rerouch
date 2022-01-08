@@ -1,9 +1,10 @@
+import { ObjectId } from 'mongodb';
 import type { Filter } from 'mongodb';
 
 import { getSessionCookieValue } from '../utils/crypto.js';
 import { addDaysToDate } from '../utils/dates.js';
 
-import { createMongoClient, ObjectId } from './common.js';
+import { createMongoClient } from './common.js';
 
 const SESSIONS_COLLECTION = 'sessions';
 

@@ -8,7 +8,7 @@ import FastifySwaggerPlugin from 'fastify-swagger';
 
 import CONFIG from '../config.js';
 
-import { appRoutes, authRoutes } from './routes/index.js';
+import { appRoutes, authRoutes, userRoutes } from './routes/index.js';
 import { verifySession, verifyAdminUserSession, verifyCaptcha } from './auth-decorators.js';
 
 const app = Fastify();
@@ -67,6 +67,8 @@ app.get('/robots.txt', { schema: { hide: true } }, async (req, res) => {
 app.register(appRoutes, { prefix: '/api/app' });
 
 app.register(authRoutes, { prefix: '/api/auth' });
+
+app.register(userRoutes, { prefix: '/api/user' });
 
 app.setNotFoundHandler(async (req, res) => {
     res.status(404);
