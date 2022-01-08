@@ -1,0 +1,12 @@
+.rr-section {
+    padding: 25px;
+    border: 1px solid #cbcbcb;
+
+    &__content {
+        margin-top: 15px;
+    }
+
+    &:not(:first-child) {
+        margin-top: 25px;
+    }
+}

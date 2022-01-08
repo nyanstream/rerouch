@@ -1,0 +1,25 @@
+.userManagement {
+    &__roles {
+        margin-top: 10px;
+
+        ul {
+            &,
+            li {
+                display: inline-block;
+            }
+
+            li {
+                border: 1px solid #ccc;
+                border-radius: 10px;
+
+                line-height: 1em;
+
+                padding: 2.5px 5px;
+
+                &:not(:first-child) {
+                    margin-left: 0.25em;
+                }
+            }
+        }
+    }
+}
