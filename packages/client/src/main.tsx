@@ -3,15 +3,20 @@ import ReactDOM from 'react-dom';
 
 import { HashRouter } from 'react-router-dom';
 
-import { App } from './components/App';
+import { Provider as ReduxProvider } from 'react-redux';
+import ReduxStore from './redux/store';
+
+import App from './components/App/Components/AppContainer';
 
 import './main.scss';
 
 ReactDOM.render(
-    <HashRouter>
-        <React.StrictMode>
-            <App />
-        </React.StrictMode>
-    </HashRouter>,
+    <ReduxProvider store={ReduxStore}>
+        <HashRouter>
+            <React.StrictMode>
+                <App />
+            </React.StrictMode>
+        </HashRouter>
+    </ReduxProvider>,
     document.getElementById('root')
 );

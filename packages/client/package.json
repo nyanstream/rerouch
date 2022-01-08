@@ -14,13 +14,15 @@
     },
     "dependencies": {
         "@reduxjs/toolkit": "1.7.1",
+        "classnames": "2.3.1",
         "formik": "2.2.9",
         "ky": "0.28.7",
         "react": "17.0.2",
         "react-dom": "17.0.2",
         "react-recaptcha-x": "1.1.13",
         "react-redux": "7.2.6",
-        "react-router-dom": "6.2.1"
+        "react-router-dom": "6.2.1",
+        "yup": "0.32.11"
     },
     "devDependencies": {
         "@types/react": "17.0.38",
