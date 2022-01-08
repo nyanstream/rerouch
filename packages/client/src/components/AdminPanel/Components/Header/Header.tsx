@@ -4,7 +4,14 @@ import * as ROUTES from '../../../App/routes';
 
 import './Header.scss';
 
-const Header: React.FC = () => {
+type PropsType = {
+    IsLoginPending: boolean;
+    handleLogout: () => void;
+};
+
+const Header: React.FC<PropsType> = props => {
+    const { IsLoginPending, handleLogout } = props;
+
     return (
         <header className="adminPanel__header">
             <div className="adminPanel__header__flex">
@@ -33,7 +40,9 @@ const Header: React.FC = () => {
                 </nav>
 
                 <div className="adminPanel__header__logoutBox">
-                    <button className="adminPanel__header__logoutBox__btn">Выход</button>
+                    <button className="adminPanel__header__logoutBox__btn" onClick={handleLogout} disabled={IsLoginPending}>
+                        Выход
+                    </button>
                 </div>
             </div>
         </header>

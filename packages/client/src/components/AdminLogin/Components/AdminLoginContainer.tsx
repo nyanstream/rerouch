@@ -8,14 +8,14 @@ import { ADMIN_PAGE_DEFAULT_ROUTE } from '../../App/routes';
 import { loginThunk, checkAuthThunk } from '../AdminLoginReduxSlice';
 import { resetLoginError } from '../AdminLoginReduxSlice';
 
-import { getIsUserLoggedIn, getIsLoginPending, getIsLogihError, getIsLoginCheckComplete } from '../AdminLoginReduxSelectors';
+import { getIsUserLoggedIn, getIsLoginPending, getIsLoginError, getIsLoginCheckComplete } from '../AdminLoginReduxSelectors';
 
 import AdminLogin from './AdminLogin';
 
 const AdminLoginContainer: React.FC = () => {
     const IsUserLoggedIn = useSelector(getIsUserLoggedIn);
     const IsLoginPending = useSelector(getIsLoginPending);
-    const IsLogihError = useSelector(getIsLogihError);
+    const IsLoginError = useSelector(getIsLoginError);
     const IsLoginCheckComplete = useSelector(getIsLoginCheckComplete);
 
     const dispatch = useDispatch();
@@ -36,7 +36,7 @@ const AdminLoginContainer: React.FC = () => {
 
     if (IsUserLoggedIn) return <Navigate to={ADMIN_PAGE_DEFAULT_ROUTE} />;
 
-    return <AdminLogin {...{ IsLoginPending, IsLogihError }} {...{ formDataHandler }} />;
+    return <AdminLogin {...{ IsLoginPending, IsLoginError }} {...{ formDataHandler }} />;
 };
 
 export default AdminLoginContainer;

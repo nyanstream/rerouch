@@ -10,12 +10,12 @@ import { AdminLoginValidationSchema } from '../logic/validationSchemas';
 
 import './AdminLogin.scss';
 
-type PropsType = Pick<AdminLoginStateType, 'IsLoginPending' | 'IsLogihError'> & {
+type PropsType = Pick<AdminLoginStateType, 'IsLoginPending' | 'IsLoginError'> & {
     formDataHandler: (data: LoginQueryParamsType) => void;
 };
 
 const AdminLogin: React.FC<PropsType> = props => {
-    const { IsLoginPending, IsLogihError } = props;
+    const { IsLoginPending, IsLoginError } = props;
     const { formDataHandler } = props;
 
     const initialValues = useRef<LoginQueryParamsType>({
@@ -75,7 +75,7 @@ const AdminLogin: React.FC<PropsType> = props => {
                 }}
             </Formik>
 
-            {IsLogihError ? <div className="adminLogin__error">ошибка авторизации</div> : null}
+            {IsLoginError ? <div className="adminLogin__error">ошибка авторизации</div> : null}
         </div>
     );
 };

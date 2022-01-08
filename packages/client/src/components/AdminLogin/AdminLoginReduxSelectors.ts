@@ -12,12 +12,22 @@ export const getIsLoginPending = createSelector(
     IsLoginPending => IsLoginPending
 );
 
-export const getIsLogihError = createSelector(
-    (state: RootStateType) => state.adminLogin.IsLogihError,
-    IsLogihError => IsLogihError
+export const getIsLoginError = createSelector(
+    (state: RootStateType) => state.adminLogin.IsLoginError,
+    IsLoginError => IsLoginError
 );
 
 export const getIsLoginCheckComplete = createSelector(
     (state: RootStateType) => state.adminLogin.IsLoginCheckComplete,
     IsLoginCheckComplete => IsLoginCheckComplete
+);
+
+export const getIsUserInfoPending = createSelector(
+    (state: RootStateType) => state.adminLogin.IsUserInfoPending,
+    IsUserInfoPending => IsUserInfoPending
+);
+
+export const getUserInfo = createSelector(
+    (state: RootStateType) => state.adminLogin.UserInfo,
+    UserInfo => UserInfo
 );

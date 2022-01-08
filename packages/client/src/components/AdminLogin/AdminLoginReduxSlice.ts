@@ -3,27 +3,37 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 
 import type { AdminLoginStateType } from './AdminLoginTypes';
 
-import AuthAPI from '../../api/services/authService';
+import { AuthAPI, UserAPI } from '../../api/services';
 
 export const ReducerName = 'adminLogin';
 
-const { login, checkAuth } = AuthAPI;
+export const loginThunk = createAsyncThunk(`${ReducerName}/login`, async (params: Parameters<typeof AuthAPI.login>[0]) => {
+    const response = await AuthAPI.login(params);
+    return response.status;
+});
 
-export const loginThunk = createAsyncThunk(`${ReducerName}/login`, async (params: Parameters<typeof login>[0]) => {
-    const response = await login(params);
+export const logoutThunk = createAsyncThunk(`${ReducerName}/logout`, async () => {
+    const response = await AuthAPI.logout();
     return response.status;
 });
 
 export const checkAuthThunk = createAsyncThunk(`${ReducerName}/checkAuth`, async () => {
-    const response = await checkAuth();
+    const response = await AuthAPI.checkAuth();
     return response.status;
+});
+
+export const getCurrentUserInfoThunk = createAsyncThunk(`${ReducerName}/getCurrentUserInfo`, async () => {
+    const response = await UserAPI.getCurrentUserInfo();
+    return response;
 });
 
 const InnitialState: AdminLoginStateType = {
     IsUserLoggedIn: false,
     IsLoginPending: false,
-    IsLogihError: false,
+    IsLoginError: false,
     IsLoginCheckComplete: false,
+    IsUserInfoPending: false,
+    UserInfo: null,
 };
 
 const AdminLoginSlice = createSlice({
@@ -31,7 +41,7 @@ const AdminLoginSlice = createSlice({
     initialState: InnitialState,
     reducers: {
         resetLoginError: (state, action: PayloadAction<void>) => {
-            state.IsLogihError = false;
+            state.IsLoginError = false;
         },
     },
     extraReducers: builder => {
@@ -40,12 +50,25 @@ const AdminLoginSlice = createSlice({
         });
         builder.addCase(loginThunk.fulfilled, (state, action) => {
             state.IsUserLoggedIn = true;
-            state.IsLogihError = false;
+            state.IsLoginError = false;
             state.IsLoginPending = false;
         });
         builder.addCase(loginThunk.rejected, (state, action) => {
             state.IsUserLoggedIn = false;
-            state.IsLogihError = true;
+            state.IsLoginError = true;
+            state.IsLoginPending = false;
+        });
+
+        builder.addCase(logoutThunk.pending, (state, action) => {
+            state.IsLoginPending = true;
+        });
+        builder.addCase(logoutThunk.fulfilled, (state, action) => {
+            state.IsUserLoggedIn = false;
+            state.IsLoginError = false;
+            state.IsLoginPending = false;
+            state.UserInfo = null;
+        });
+        builder.addCase(logoutThunk.rejected, (state, action) => {
             state.IsLoginPending = false;
         });
 
@@ -59,6 +82,18 @@ const AdminLoginSlice = createSlice({
         builder.addCase(checkAuthThunk.rejected, (state, action) => {
             state.IsUserLoggedIn = false;
             state.IsLoginCheckComplete = true;
+        });
+
+        builder.addCase(getCurrentUserInfoThunk.pending, (state, action) => {
+            state.IsUserInfoPending = true;
+        });
+        builder.addCase(getCurrentUserInfoThunk.fulfilled, (state, action) => {
+            state.IsUserInfoPending = false;
+            state.UserInfo = action.payload;
+        });
+        builder.addCase(getCurrentUserInfoThunk.rejected, (state, action) => {
+            state.IsUserInfoPending = false;
+            console.warn(action.error);
         });
     },
 });
