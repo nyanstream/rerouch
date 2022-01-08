@@ -1,7 +1,9 @@
+import { fetch } from 'cross-fetch';
 import { ObjectId } from 'mongodb';
 import type { FastifyRequest, preHandlerHookHandler } from 'fastify';
 
-import type { SessionType } from '../db/sessions.js';
+import CONFIG from '../config.js';
+
 import { getSession } from '../db/sessions.js';
 
 import { UserRoles, getUser } from '../db/users.js';
@@ -58,5 +60,27 @@ export const verifyAdminUserSession: preHandlerHookHandler = async (req, res) =>
     if (!user.roles.includes(UserRoles.admin)) {
         res.code(401).send();
         throw new Error('User does not have admin role');
+    }
+};
+
+export const verifyCaptcha: preHandlerHookHandler = async (req, res) => {
+    const requestBody = req.body as { captcha: string };
+
+    if (!CONFIG.API_KEYS.recaptcha) {
+        res.code(500).send();
+        throw new Error('Recaptcha API key not specified');
+    }
+
+    const captchaProviderUrl = new URL('https://www.google.com/recaptcha/api/siteverify');
+
+    captchaProviderUrl.searchParams.append('secret', CONFIG.API_KEYS.recaptcha);
+    captchaProviderUrl.searchParams.append('response', requestBody.captcha);
+
+    const recaptchaResponse = await fetch(captchaProviderUrl.toString());
+    const recaptchaResponseData = await recaptchaResponse.json();
+
+    if (!recaptchaResponseData.success) {
+        res.code(401).send();
+        throw new Error('Сaptcha failed');
     }
 };

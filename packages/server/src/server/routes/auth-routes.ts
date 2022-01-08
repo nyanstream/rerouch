@@ -9,6 +9,8 @@ import { getUser, getUsers, getUsersCount } from '../../db/users.js';
 
 import { createSession } from '../../db/sessions.js';
 
+import type { LoginQueryParamsType } from './auth-routes.types.js';
+
 const createUser = async (username: string, password: string, roles: UserRoles[]) => {
     try {
         const passwordData = getHashedPasswordData(password);
@@ -46,7 +48,7 @@ const routes: FastifyPluginAsync = async (app, options) => {
     };
 
     app.post('/create-admin-user-if-no-one-exists', { schema: CreateAdminUserSchema }, async (req, res) => {
-        const RequestBody = req.query as { username: string; password: string };
+        const RequestBody = req.query as Omit<LoginQueryParamsType, 'captcha'>;
 
         const usersCount = await getUsersCount();
 
@@ -63,16 +65,17 @@ const routes: FastifyPluginAsync = async (app, options) => {
     const LoginSchema: FastifySchema = {
         body: {
             type: 'object',
-            required: ['username', 'password'],
+            required: ['username', 'password', 'captcha'],
             properties: {
                 username: { type: 'string' },
                 password: { type: 'string' },
+                captcha: { type: 'string' },
             },
         },
     };
 
     app.post('/login', { schema: LoginSchema }, async (req, res) => {
-        const RequestBody = req.body as { username: string; password: string };
+        const RequestBody = req.body as LoginQueryParamsType;
 
         const userInfo = await getUser({ user_name: RequestBody.username });
 

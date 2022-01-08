@@ -9,7 +9,7 @@ import FastifySwaggerPlugin from 'fastify-swagger';
 import CONFIG from '../config.js';
 
 import { appRoutes, authRoutes } from './routes/index.js';
-import { verifySession, verifyAdminUserSession } from './auth-decorators.js';
+import { verifySession, verifyAdminUserSession, verifyCaptcha } from './auth-decorators.js';
 
 const app = Fastify();
 
@@ -32,6 +32,7 @@ app.register(FastifyCookiePlugin);
 
 app.decorate('verifySession', verifySession);
 app.decorate('verifyAdminUserSession', verifyAdminUserSession);
+app.decorate('verifyCaptcha', verifyCaptcha);
 
 // Swagger
 
