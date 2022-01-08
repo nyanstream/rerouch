@@ -1,27 +1,12 @@
-import type { Filter, WithId } from 'mongodb';
+import type { Filter } from 'mongodb';
 
 import { createMongoClient } from './common.js';
+
+import { UserType, UserRoles } from './users.types.js';
 
 const USERS_COLLECTION = 'users';
 
 const client = await createMongoClient();
-
-export enum UserRoles {
-    guest = 0,
-    user,
-    moderator,
-    streamer,
-    admin,
-}
-
-export type UserType = {
-    user_name: string;
-    roles: UserRoles[];
-    password_hash: string;
-    password_salt: string;
-};
-
-export type UserWithIdType = WithId<UserType>;
 
 export const createUser = async (userDocument: Omit<UserType, 'roles'>, roles: UserRoles[] = [UserRoles.guest]) => {
     try {

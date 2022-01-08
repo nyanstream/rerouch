@@ -6,7 +6,8 @@ import CONFIG from '../config.js';
 
 import { getSession } from '../db/sessions.js';
 
-import { UserRoles, getUser } from '../db/users.js';
+import { getUser } from '../db/users.js';
+import { UserRoles } from '../db/users.types.js';
 
 const commonSessionVerifier = async (cookies: FastifyRequest['cookies']) => {
     const authCookie = cookies['authCookie'];

@@ -1,4 +1,4 @@
-import { UserRoles } from '../db/users.js';
+import { UserRoles } from '../db/users.types.js';
 import { createUser as createDbUser } from '../db/users.js';
 
 import { getHashedPasswordData } from './crypto.js';

@@ -3,7 +3,7 @@ import type { FastifyPluginAsync, FastifySchema } from 'fastify';
 
 import { createUser } from '../../utils/users.js';
 
-import { UserRoles } from '../../db/users.js';
+import { UserRoles } from '../../db/users.types.js';
 import { getUser, getUsers, getUsersCount } from '../../db/users.js';
 import { getSession } from '../../db/sessions.js';
 
