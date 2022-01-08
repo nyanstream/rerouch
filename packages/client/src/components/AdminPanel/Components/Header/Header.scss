@@ -1,0 +1,85 @@
+.adminPanel__header {
+    background-color: #4d539c;
+
+    padding: 10px;
+
+    overflow-x: auto;
+
+    &__flex {
+        display: flex;
+
+        flex-direction: row;
+
+        align-items: center;
+        justify-content: center;
+
+        min-width: min-content;
+
+        gap: 20px;
+    }
+
+    &__brand {
+        font-family: Tahoma, Geneva, Verdana, sans-serif;
+        color: #ededed;
+
+        white-space: nowrap;
+        letter-spacing: 0.125em;
+
+        cursor: default;
+        user-select: none;
+
+        & > * {
+            font-size: 1.25em;
+        }
+    }
+
+    &__nav {
+        display: flex;
+
+        align-items: center;
+
+        ul {
+            display: flex;
+
+            gap: 15px;
+        }
+
+        li {
+            list-style: none;
+            line-height: 1em;
+
+            letter-spacing: 0.05em;
+
+            a {
+                color: #fff;
+                text-decoration: none;
+
+                &.active {
+                    font-weight: 500;
+                    letter-spacing: 0.025em;
+                }
+            }
+        }
+    }
+
+    &__logoutBox {
+        &__btn {
+            background-color: transparent;
+
+            border: 1px solid #ededed;
+            border-radius: 10px;
+
+            color: #fff;
+
+            padding: 5px 10px;
+
+            cursor: pointer;
+
+            transition: all 0.2s ease-in-out;
+
+            &:hover {
+                background-color: rgba(#fff, 0.1);
+            }
+        }
+    }
+}
