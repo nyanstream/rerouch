@@ -122,6 +122,10 @@ export const clearOldSessions = async () => {
         const sessions = client.db().collection<SessionType>(SESSIONS_COLLECTION);
         const sessionsArray = await sessions.find().toArray();
 
+        if (sessionsArray.length === 0) {
+            return;
+        }
+
         const sessionsToDelete = sessionsArray
             .filter(session => {
                 const authEndDate = new Date(session.auth_end_date);

@@ -1,7 +1,6 @@
 import type { FastifyPluginAsync, FastifySchema } from 'fastify';
 
 import { getHashedPasswordData } from '../../utils/crypto.js';
-import { getIsAuth } from '../../utils/check-auth.js';
 
 import { UserRoles } from '../../db/users.js';
 
@@ -103,23 +102,28 @@ const routes: FastifyPluginAsync = async (app, options) => {
         res.status(200).send();
     });
 
-    app.head('/check', { schema: {} }, async (req, res) => {
-        const isAuth = await getIsAuth(req.cookies);
-        const responseStatus = isAuth ? 200 : 401;
-
-        res.status(responseStatus).send();
-    });
-
-    app.get('/get-users', { schema: {} }, async (req, res) => {
-        const isAuth = await getIsAuth(req.cookies);
-
-        if (isAuth) {
-            const users = await getUsers();
-            res.status(200).send(users);
+    app.head(
+        '/check',
+        {
+            schema: {},
+            preHandler: app.auth([(app as any).verifySession]),
+        },
+        async (req, res) => {
+            res.status(200).send();
         }
+    );
 
-        res.status(401).send([]);
-    });
+    app.get(
+        '/get-users',
+        {
+            schema: {},
+            preHandler: app.auth([(app as any).verifyAdminUserSession]),
+        },
+        async (req, res) => {
+            const users = await getUsers();
+            res.status(200).send(users ?? []);
+        }
+    );
 };
 
 export default routes;

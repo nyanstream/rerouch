@@ -4,6 +4,8 @@ import server from './server/index.js';
 import { createMongoClient } from './db/common.js';
 import { clearOldSessions } from './db/sessions.js';
 
+const mongoClient = await createMongoClient();
+
 try {
     console.log('Checking for required server config variables...');
 
@@ -19,17 +21,15 @@ try {
 try {
     console.log('Checking connection to the database...');
 
-    const mongoClient = await createMongoClient();
-
     await mongoClient.connect();
     await mongoClient.db('admin').command({ ping: 1 });
 
     console.log('Checking succeeded.');
-
-    await mongoClient.close();
 } catch (err) {
     console.warn(err);
     process.exit(1);
+} finally {
+    await mongoClient.close();
 }
 
 server.listen(CONFIG.server.port, CONFIG.server.host, (err, address) => {

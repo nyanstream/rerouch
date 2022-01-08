@@ -8,7 +8,8 @@ import FastifySwaggerPlugin from 'fastify-swagger';
 
 import CONFIG from '../config.js';
 
-import { authRoutes } from './routes/index.js';
+import { appRoutes, authRoutes } from './routes/index.js';
+import { verifySession, verifyAdminUserSession } from './auth-decorators.js';
 
 const app = Fastify();
 
@@ -29,18 +30,12 @@ app.register(FastifyHelmetPlugin, {
 
 app.register(FastifyCookiePlugin);
 
+app.decorate('verifySession', verifySession);
+app.decorate('verifyAdminUserSession', verifyAdminUserSession);
+
 // Swagger
 
 const DocsPath = '/apidocs';
-
-app.addHook('onRequest', (req, res, next) => {
-    // if (req.routerPath.startsWith(DocsPath) && !getIsAuth(req.cookies)) {
-    //     res.status(401).send();
-    //     return;
-    // }
-
-    next();
-});
 
 app.register(FastifySwaggerPlugin, {
     routePrefix: DocsPath,
@@ -68,13 +63,9 @@ app.get('/robots.txt', { schema: { hide: true } }, async (req, res) => {
 
 // Routes
 
+app.register(appRoutes, { prefix: '/api/app' });
+
 app.register(authRoutes, { prefix: '/api/auth' });
-
-// app.register(sendFormRoutes, { prefix: '/api/send-form' });
-
-// app.register(gamesRoutes, { prefix: '/api/games' });
-
-// app.register(twitchLiveStreamsRoutes, { prefix: '/api/twitch' });
 
 app.setNotFoundHandler(async (req, res) => {
     res.status(404);
