@@ -1,12 +1,12 @@
 import { ObjectId } from 'mongodb';
 import type { FastifyPluginAsync, FastifySchema } from 'fastify';
 
-import { getSchedule, createAir, updateAir } from '../../db/schedule.js';
+import { getSchedule, getAirsCount, createAir, updateAir } from '../../db/schedule.js';
 import { AirType } from '../../db/schedule.types.js';
 
 import { getUser } from '../../db/users.js';
 
-import type { ScheduleQueryParamsType } from './schedule-routes.types.js';
+import type { ScheduleQueryParamsType, ScheduleQueryResponseType } from './schedule-routes.types.js';
 import type { CreateAirQueryParamsType, CreateAirQueryResponseType } from './schedule-routes.types.js';
 import type { EditAirQueryParamsType } from './schedule-routes.types.js';
 
@@ -33,8 +33,14 @@ const routes: FastifyPluginAsync = async (app, options) => {
             const { skip = 0, limit = 20 } = RequestParams;
 
             const schedule = await getSchedule({}, { skip, limit, sort: ['start_date', 'asc'] });
+            const scheduleSize = await getAirsCount();
 
-            res.status(200).send(schedule);
+            const ResponseObject: ScheduleQueryResponseType = {
+                data: schedule,
+                totalCount: scheduleSize,
+            };
+
+            res.status(200).send(ResponseObject);
         }
     );
 

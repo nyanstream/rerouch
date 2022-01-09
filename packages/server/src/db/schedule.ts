@@ -41,6 +41,21 @@ export const getSchedule = async (filter: Filter<AirType>, options?: FindOptions
     }
 };
 
+export const getAirsCount = async (filter: Filter<AirType> = {}) => {
+    const client = await createMongoClient();
+
+    try {
+        await client.connect();
+
+        const schedule = client.db().collection<AirType>(SCHEDULE_COLLECTION);
+        const airsCount = await schedule.find(filter).count();
+
+        return airsCount;
+    } finally {
+        await client.close();
+    }
+};
+
 export const updateAir = async (filter: Filter<AirType>, updateDoc: UpdateFilter<AirType>) => {
     const client = await createMongoClient();
 
