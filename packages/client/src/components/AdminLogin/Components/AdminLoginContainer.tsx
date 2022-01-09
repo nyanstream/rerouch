@@ -5,7 +5,7 @@ import { Navigate } from 'react-router-dom';
 
 import { ADMIN_PAGE_DEFAULT_ROUTE } from '../../App/routes';
 
-import { loginThunk, checkAuthThunk } from '../AdminLoginReduxSlice';
+import { loginThunk } from '../AdminLoginReduxSlice';
 import { resetLoginError } from '../AdminLoginReduxSlice';
 
 import { getIsUserLoggedIn, getIsLoginPending, getIsLoginError, getIsLoginCheckComplete } from '../AdminLoginReduxSelectors';
@@ -21,12 +21,10 @@ const AdminLoginContainer: React.FC = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(checkAuthThunk());
-
         return () => {
             dispatch(resetLoginError());
         };
-    }, []);
+    }, [dispatch]);
 
     const formDataHandler = useCallback((data: Parameters<typeof loginThunk>[0]) => {
         dispatch(loginThunk(data));

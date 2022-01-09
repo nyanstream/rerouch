@@ -1,5 +1,7 @@
 import classnames from 'classnames';
-import type { FieldInputProps } from 'formik';
+import type { FieldInputProps, FormikFormProps } from 'formik';
+
+import './TextInput.scss';
 
 type PropsTyp = {
     form: any;
@@ -13,12 +15,12 @@ type PropsTyp = {
 };
 
 export const TextInput: React.FC<PropsTyp> = props => {
-    const { form, field } = props;
+    const { field } = props;
     const { type = 'text', placeholder, label, labelHidden } = props;
     const { className, required } = props;
 
     const renderLabel = () => {
-        if (!label || labelHidden === false) {
+        if (!label) {
             return null;
         }
 

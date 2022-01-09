@@ -4,7 +4,7 @@ import { Formik, Form, Field } from 'formik';
 import type { LoginQueryParamsType } from '../../../api/services/authService/types';
 import type { AdminLoginStateType } from '../AdminLoginTypes';
 
-import { TextInput, CaptchaInput } from '../../common';
+import { TextInput, CaptchaInput, Button } from '../../common';
 
 import { AdminLoginValidationSchema } from '../logic/validationSchemas';
 
@@ -37,7 +37,7 @@ const AdminLogin: React.FC<PropsType> = props => {
 
             <Formik initialValues={initialValues.current} validationSchema={AdminLoginValidationSchema} onSubmit={submitHandler}>
                 {({ isSubmitting, dirty, isValidating, isValid }) => {
-                    const isSubmitDisabled = isSubmitting || isValidating || !isValid || !dirty;
+                    const isSubmitDisabled = IsLoginPending || isSubmitting || isValidating || !isValid || !dirty;
 
                     return (
                         <Form className="adminLogin__form">
@@ -65,10 +65,10 @@ const AdminLogin: React.FC<PropsType> = props => {
 
                             <Field name="captcha" className="adminLogin__formItem" component={CaptchaInput} />
 
-                            <div className="adminLogin__submitButton">
-                                <button type="submit" disabled={IsLoginPending || isSubmitDisabled}>
+                            <div className="adminLogin__submitBox">
+                                <Button type="submit" disabled={isSubmitDisabled}>
                                     Войти
-                                </button>
+                                </Button>
                             </div>
                         </Form>
                     );

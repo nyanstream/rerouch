@@ -1,0 +1,14 @@
+.rr-formItem {
+    $formItem: &;
+
+    &--textInput {
+        input {
+            border: 1px solid #cbcbcb;
+        }
+
+        #{$formItem}__input {
+            width: 100%;
+            padding: 10px;
+        }
+    }
+}

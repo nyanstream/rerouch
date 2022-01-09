@@ -16,61 +16,13 @@
     }
 
     &__formItem {
-        &.rr-formItem--textInput {
-            input {
-                border: 1px solid #cbcbcb;
-            }
-        }
-
-        &[data-type='captcha'] {
-            & > div {
-                & > div {
-                    margin: 0 auto;
-                }
-            }
-        }
-
         &:not(:first-child) {
             margin-top: 20px;
         }
-
-        &__input {
-            width: 100%;
-            padding: 10px;
-        }
     }
 
-    &__captchaInput {
-        width: max-content;
-
-        margin: 15px auto 0;
-
-        div {
-            width: max-content;
-        }
-    }
-
-    &__submitButton {
+    &__submitBox {
         margin-top: 20px;
-
-        button {
-            padding: 5px 20px;
-
-            background-color: #f1f1f1;
-            border: 1px solid #cbcbcb;
-
-            transition: all 0.3s ease-in-out;
-
-            cursor: pointer;
-
-            &:hover {
-                background-color: #fdfdfd;
-            }
-
-            &:disabled {
-                cursor: not-allowed;
-            }
-        }
     }
 
     &__error {

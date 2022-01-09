@@ -36,7 +36,7 @@ const InnitialState: AdminLoginStateType = {
     UserInfo: null,
 };
 
-const AdminLoginSlice = createSlice({
+const AdminLogin = createSlice({
     name: ReducerName,
     initialState: InnitialState,
     reducers: {
@@ -98,6 +98,6 @@ const AdminLoginSlice = createSlice({
     },
 });
 
-export const { resetLoginError } = AdminLoginSlice.actions;
+export const { resetLoginError } = AdminLogin.actions;
 
-export default AdminLoginSlice.reducer;
+export default AdminLogin.reducer;

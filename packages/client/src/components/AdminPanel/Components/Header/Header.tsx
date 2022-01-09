@@ -2,6 +2,8 @@ import { NavLink } from 'react-router-dom';
 
 import * as ROUTES from '../../../App/routes';
 
+import { Button } from '../../../common';
+
 import './Header.scss';
 
 type PropsType = {
@@ -40,9 +42,9 @@ const Header: React.FC<PropsType> = props => {
                 </nav>
 
                 <div className="adminPanel__header__logoutBox">
-                    <button className="adminPanel__header__logoutBox__btn" onClick={handleLogout} disabled={IsLoginPending}>
+                    <Button className="adminPanel__header__logoutBox__btn" ghost whiteText rounded onClick={handleLogout} disabled={IsLoginPending}>
                         Выход
-                    </button>
+                    </Button>
                 </div>
             </div>
         </header>

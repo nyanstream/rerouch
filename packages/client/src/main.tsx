@@ -8,6 +8,7 @@ import ReduxStore from './redux/store';
 
 import App from './components/App/Components/AppContainer';
 
+import 'react-toastify/dist/ReactToastify.css';
 import './main.scss';
 
 ReactDOM.render(

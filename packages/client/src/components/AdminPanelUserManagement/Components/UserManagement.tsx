@@ -5,6 +5,8 @@ import { Section } from '../../common';
 
 import type { AdminLoginStateType } from '../../AdminLogin/AdminLoginTypes';
 
+import ChangePasswordForm from './ChangePasswordForm/ChangePasswordFormContainer';
+
 import './UserManagement.scss';
 
 type PropsType = {
@@ -35,7 +37,7 @@ const UserManagement: React.FC<PropsType> = props => {
             </Section>
 
             <Section title="Смена пароля">
-                <div>Пока недоступно</div>
+                <ChangePasswordForm />
             </Section>
         </div>
     );

@@ -64,22 +64,7 @@
 
     &__logoutBox {
         &__btn {
-            background-color: transparent;
-
-            border: 1px solid #ededed;
-            border-radius: 10px;
-
-            color: #fff;
-
             padding: 5px 10px;
-
-            cursor: pointer;
-
-            transition: all 0.2s ease-in-out;
-
-            &:hover {
-                background-color: rgba(#fff, 0.1);
-            }
         }
     }
 
