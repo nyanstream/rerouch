@@ -7,9 +7,10 @@ export type ScheduleQueryParamsType = {
     limit?: number;
 };
 
-export type ScheduleQueryResponseType = {
-    data: WithId<AirType>[];
-    totalCount: number;
+export type ScheduleQueryResponseType = WithId<AirType>[];
+
+export type AirsCountQueryResponseType = {
+    count: number;
 };
 
 export type CreateAirQueryParamsType = {

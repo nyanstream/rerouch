@@ -5,6 +5,7 @@ import * as ROUTES from '../../App/routes';
 
 import { Suspense } from '../../common';
 
+const AdminPanelSchedule = lazy(() => import('../../AdminPanelSchedule/Components/AdminPanelScheduleContainer'));
 const AdminPanelUserManagement = lazy(() => import('../../AdminPanelUserManagement/Components/UserManagementContainer'));
 
 import Header from './Header/HeaderContainer';
@@ -21,7 +22,7 @@ const AdminPanel: React.FC = () => {
             path: cleanRoute(ROUTES.ADMIN_PAGE_SCHEDULE_ROUTE),
             element: (
                 <Suspense>
-                    <>{ROUTES.ADMIN_PAGE_SCHEDULE_ROUTE}</>
+                    <AdminPanelSchedule />
                 </Suspense>
             ),
         },

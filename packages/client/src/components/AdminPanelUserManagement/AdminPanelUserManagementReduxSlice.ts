@@ -7,7 +7,7 @@ import { UserAPI } from '../../api/services';
 
 export const ReducerName = 'adminPanelUserManagement';
 
-export const changePasswordThunk = createAsyncThunk(`${ReducerName}/login`, async (params: Parameters<typeof UserAPI.changePassword>[0]) => {
+export const changePasswordThunk = createAsyncThunk(`${ReducerName}/changePassword`, async (params: Parameters<typeof UserAPI.changePassword>[0]) => {
     const response = await UserAPI.changePassword(params);
     return response.status;
 });

@@ -10,6 +10,7 @@ import { getSession } from '../../db/sessions.js';
 
 import type { LoginQueryParamsType } from './auth-routes.types.js';
 import type { CurrentUserInfoQueryResponseType, ChangePasswordQueryParamsType } from './user-routes.types.js';
+import type { StreamersQueryResponseType } from './user-routes.types.js';
 
 const routes: FastifyPluginAsync = async (app, options) => {
     const CreateAdminUserSchema: FastifySchema = {
@@ -100,7 +101,17 @@ const routes: FastifyPluginAsync = async (app, options) => {
         },
         async (req, res) => {
             const users = await getUsers({ roles: UserRoles.streamer });
-            res.status(200).send(users ?? []);
+
+            const streamers = users.map(user => {
+                const userInfo: StreamersQueryResponseType[0] = {
+                    id: user._id,
+                    username: user.user_name,
+                };
+
+                return userInfo;
+            });
+
+            res.status(200).send(streamers);
         }
     );
 

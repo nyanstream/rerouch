@@ -15,3 +15,12 @@ export type CurrentUserInfoQueryResponseType = {
 export type ChangePasswordQueryParamsType = {
     password: string;
 };
+
+export type RolesQueryResponseType = UserRoleType[];
+
+export type StreamerUserType = {
+    id: UserWithIdType['_id'];
+    username: UserWithIdType['user_name'];
+};
+
+export type StreamersQueryResponseType = StreamerUserType[];

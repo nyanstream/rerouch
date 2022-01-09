@@ -7,6 +7,7 @@ import { AirType } from '../../db/schedule.types.js';
 import { getUser } from '../../db/users.js';
 
 import type { ScheduleQueryParamsType, ScheduleQueryResponseType } from './schedule-routes.types.js';
+import type { AirsCountQueryResponseType } from './schedule-routes.types.js';
 import type { CreateAirQueryParamsType, CreateAirQueryResponseType } from './schedule-routes.types.js';
 import type { EditAirQueryParamsType } from './schedule-routes.types.js';
 
@@ -15,7 +16,7 @@ const routes: FastifyPluginAsync = async (app, options) => {
         querystring: {
             type: 'object',
             properties: {
-                skip: { type: 'number', minimum: 1 },
+                skip: { type: 'number', minimum: 0 },
                 limit: { type: 'number', minimum: 1 },
             },
         },
@@ -33,14 +34,27 @@ const routes: FastifyPluginAsync = async (app, options) => {
             const { skip = 0, limit = 20 } = RequestParams;
 
             const schedule = await getSchedule({}, { skip, limit, sort: ['start_date', 'asc'] });
+
+            const responseObject: ScheduleQueryResponseType = schedule;
+
+            res.status(200).send(responseObject);
+        }
+    );
+
+    app.get(
+        '/get-airs-count',
+        {
+            schema: {},
+            preHandler: app.auth([(app as any).verifyStreamerUserSession]),
+        },
+        async (req, res) => {
             const scheduleSize = await getAirsCount();
 
-            const ResponseObject: ScheduleQueryResponseType = {
-                data: schedule,
-                totalCount: scheduleSize,
+            const responseObject: AirsCountQueryResponseType = {
+                count: scheduleSize,
             };
 
-            res.status(200).send(ResponseObject);
+            res.status(200).send(responseObject);
         }
     );
 
@@ -78,7 +92,7 @@ const routes: FastifyPluginAsync = async (app, options) => {
         },
     };
 
-    app.get(
+    app.post(
         '/create-air',
         {
             schema: CreateAirSchema,
@@ -128,7 +142,7 @@ const routes: FastifyPluginAsync = async (app, options) => {
         },
     };
 
-    app.get(
+    app.patch(
         '/edit-air',
         {
             schema: EditAirSchema,
