@@ -5,3 +5,7 @@ export type CurrentUserInfoQueryResponseType = {
     username: UserWithIdType['user_name'];
     roles: UserWithIdType['roles'];
 };
+
+export type ChangePasswordQueryParamsType = {
+    password: string;
+};

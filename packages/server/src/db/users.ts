@@ -1,4 +1,4 @@
-import type { Filter } from 'mongodb';
+import type { Filter, UpdateFilter } from 'mongodb';
 
 import { createMongoClient } from './common.js';
 
@@ -62,6 +62,18 @@ export const getUsersCount = async (filter: Filter<UserType> = {}) => {
         const usersCount = await users.find(filter).count();
 
         return usersCount;
+    } finally {
+        await client.close();
+    }
+};
+
+export const updateUser = async (filter: Filter<UserType>, updateDoc: UpdateFilter<UserType>) => {
+    try {
+        await client.connect();
+
+        const users = client.db().collection<UserType>(USERS_COLLECTION);
+
+        await users.updateOne(filter, updateDoc);
     } finally {
         await client.close();
     }

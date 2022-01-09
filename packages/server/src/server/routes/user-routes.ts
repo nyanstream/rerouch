@@ -2,12 +2,14 @@ import { ObjectId } from 'mongodb';
 import type { FastifyPluginAsync, FastifySchema } from 'fastify';
 
 import { createUser } from '../../utils/users.js';
+import { getHashedPasswordData } from '../../utils/crypto.js';
 
 import { UserRoles } from '../../db/users.types.js';
-import { getUser, getUsers, getUsersCount } from '../../db/users.js';
+import { getUser, getUsers, getUsersCount, updateUser } from '../../db/users.js';
 import { getSession } from '../../db/sessions.js';
 
 import type { LoginQueryParamsType } from './auth-routes.types.js';
+import type { ChangePasswordQueryParamsType } from './user-routes.types.js';
 
 const routes: FastifyPluginAsync = async (app, options) => {
     const CreateAdminUserSchema: FastifySchema = {
@@ -15,8 +17,8 @@ const routes: FastifyPluginAsync = async (app, options) => {
             type: 'object',
             required: ['username', 'password'],
             properties: {
-                username: { type: 'string' },
-                password: { type: 'string' },
+                username: { type: 'string', minimum: 1 },
+                password: { type: 'string', minimum: 1 },
             },
         },
         response: {
@@ -81,6 +83,57 @@ const routes: FastifyPluginAsync = async (app, options) => {
         async (req, res) => {
             const users = await getUsers();
             res.status(200).send(users ?? []);
+        }
+    );
+
+    const ChangePasswordSchema: FastifySchema = {
+        body: {
+            type: 'object',
+            required: ['password'],
+            properties: {
+                password: { type: 'string', minimum: 1 },
+            },
+        },
+    };
+
+    app.patch(
+        '/change-password',
+        {
+            schema: ChangePasswordSchema,
+            preHandler: app.auth([(app as any).verifySession]),
+        },
+        async (req, res) => {
+            const RequestBody = req.body as ChangePasswordQueryParamsType;
+
+            const authCookie = req.cookies['authCookie'];
+
+            const session = await getSession({ cookie: authCookie });
+
+            if (!session) {
+                res.status(500).send();
+                return;
+            }
+
+            const user = await getUser({ _id: new ObjectId(session.user_id) });
+
+            if (!user) {
+                res.status(500).send();
+                return;
+            }
+
+            const newPasswordData = getHashedPasswordData(RequestBody.password);
+
+            await updateUser(
+                { _id: user._id },
+                {
+                    $set: {
+                        password_salt: newPasswordData.salt,
+                        password_hash: newPasswordData.hash,
+                    },
+                }
+            );
+
+            res.status(200).send();
         }
     );
 };
