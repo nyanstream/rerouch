@@ -6,19 +6,9 @@ import { addDaysToDate } from '../utils/dates.js';
 
 import { createMongoClient } from './common.js';
 
+import { SessionType, NewSessionType } from './sessions.types.js';
+
 const SESSIONS_COLLECTION = 'sessions';
-
-export type SessionType = {
-    cookie: string;
-    user_id: string;
-    auth_date: Date;
-    auth_end_date: Date;
-};
-
-type NewSessionType = {
-    id: string;
-    data: SessionType;
-};
 
 export const createSession = async (userId: SessionType['user_id']) => {
     const client = await createMongoClient();

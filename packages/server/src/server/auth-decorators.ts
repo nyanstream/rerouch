@@ -41,6 +41,29 @@ export const verifySession: preHandlerHookHandler = async (req, res) => {
     }
 };
 
+export const verifyStreamerUserSession: preHandlerHookHandler = async (req, res) => {
+    const result = await commonSessionVerifier(req.cookies);
+
+    if (result instanceof Error) {
+        res.code(401).send();
+        throw result;
+    }
+
+    const sessionInfo = result;
+
+    const user = await getUser({ _id: new ObjectId(sessionInfo.user_id) });
+
+    if (!user) {
+        res.code(401).send();
+        throw new Error('User not found (???)');
+    }
+
+    if (!user.roles.includes(UserRoles.streamer)) {
+        res.code(401).send();
+        throw new Error('User does not have streamer role');
+    }
+};
+
 export const verifyAdminUserSession: preHandlerHookHandler = async (req, res) => {
     const result = await commonSessionVerifier(req.cookies);
 

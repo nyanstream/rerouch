@@ -8,8 +8,8 @@ import FastifySwaggerPlugin from 'fastify-swagger';
 
 import CONFIG from '../config.js';
 
-import { appRoutes, authRoutes, userRoutes } from './routes/index.js';
-import { verifySession, verifyAdminUserSession, verifyCaptcha } from './auth-decorators.js';
+import { appRoutes, authRoutes, scheduleRoutes, userRoutes } from './routes/index.js';
+import { verifySession, verifyStreamerUserSession, verifyAdminUserSession, verifyCaptcha } from './auth-decorators.js';
 
 const app = Fastify();
 
@@ -31,6 +31,7 @@ app.register(FastifyHelmetPlugin, {
 app.register(FastifyCookiePlugin);
 
 app.decorate('verifySession', verifySession);
+app.decorate('verifyStreamerUserSession', verifyStreamerUserSession);
 app.decorate('verifyAdminUserSession', verifyAdminUserSession);
 app.decorate('verifyCaptcha', verifyCaptcha);
 
@@ -67,6 +68,8 @@ app.get('/robots.txt', { schema: { hide: true } }, async (req, res) => {
 app.register(appRoutes, { prefix: '/api/app' });
 
 app.register(authRoutes, { prefix: '/api/auth' });
+
+app.register(scheduleRoutes, { prefix: '/api/schedule' });
 
 app.register(userRoutes, { prefix: '/api/user' });
 

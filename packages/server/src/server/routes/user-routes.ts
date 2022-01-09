@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import type { FastifyPluginAsync, FastifySchema } from 'fastify';
 
-import { createUser } from '../../utils/users.js';
+import { createUser, createUserRolesArray, getCompleteUserRolesArray } from '../../utils/users.js';
 import { getHashedPasswordData } from '../../utils/crypto.js';
 
 import { UserRoles } from '../../db/users.types.js';
@@ -66,19 +66,10 @@ const routes: FastifyPluginAsync = async (app, options) => {
                 return;
             }
 
-            const rolesArray = user.roles.map(roleId => {
-                const userRole: CurrentUserInfoQueryResponseType['roles'][0] = {
-                    id: roleId,
-                    title: UserRoles[roleId],
-                };
-
-                return userRole;
-            });
-
             const CurrentUserInfo: CurrentUserInfoQueryResponseType = {
                 id: user._id,
                 username: user.user_name,
-                roles: rolesArray,
+                roles: createUserRolesArray(user.roles),
                 registrationDate: user.registration_date.toISOString(),
             };
 
@@ -87,13 +78,25 @@ const routes: FastifyPluginAsync = async (app, options) => {
     );
 
     app.get(
-        '/get-users',
+        '/get-roles',
         {
             schema: {},
-            preHandler: app.auth([(app as any).verifyAdminUserSession]),
+            preHandler: app.auth([(app as any).verifySession]),
         },
         async (req, res) => {
-            const users = await getUsers();
+            const rolesArray = getCompleteUserRolesArray();
+            res.status(200).send(rolesArray);
+        }
+    );
+
+    app.get(
+        '/get-streamers',
+        {
+            schema: {},
+            preHandler: app.auth([(app as any).verifyStreamerUserSession]),
+        },
+        async (req, res) => {
+            const users = await getUsers({ roles: UserRoles.streamer });
             res.status(200).send(users ?? []);
         }
     );
