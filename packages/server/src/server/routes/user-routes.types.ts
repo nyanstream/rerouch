@@ -19,7 +19,7 @@ export type ChangePasswordQueryParamsType = {
 export type RolesQueryResponseType = UserRoleType[];
 
 export type StreamerUserType = {
-    id: UserWithIdType['_id'];
+    id: string;
     username: UserWithIdType['user_name'];
 };
 

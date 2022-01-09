@@ -15,6 +15,7 @@ export type AirsCountQueryResponseType = {
 
 export type CreateAirQueryParamsType = {
     text: string;
+    link: string | undefined;
     streamerId: string;
     startDate: string;
     endDate: string;

@@ -104,7 +104,7 @@ const routes: FastifyPluginAsync = async (app, options) => {
 
             const streamers = users.map(user => {
                 const userInfo: StreamersQueryResponseType[0] = {
-                    id: user._id,
+                    id: user._id.toString(),
                     username: user.user_name,
                 };
 
