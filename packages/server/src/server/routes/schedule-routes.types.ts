@@ -3,7 +3,7 @@ import { WithId } from 'mongodb';
 import { AirType } from '../../db/schedule.types.js';
 
 export type ScheduleQueryParamsType = {
-    skip: number;
+    skip?: number;
     limit?: number;
 };
 
