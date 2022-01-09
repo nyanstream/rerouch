@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { UserRoles } from '../../../api/services/userService/types';
 
 import { Section } from '../../common';
 
@@ -19,12 +18,20 @@ const UserManagement: React.FC<PropsType> = props => {
     const userRoles = useMemo(() => {
         return (
             <ul>
-                {UserInfo.roles.map(roleId => (
-                    <li key={roleId}>{UserRoles[roleId]}</li>
+                {UserInfo.roles.map(roleInfo => (
+                    <li key={roleInfo.id}>{roleInfo.title}</li>
                 ))}
             </ul>
         );
     }, [UserInfo.roles]);
+
+    const registrationDate = useMemo(() => {
+        const date = new Date(UserInfo.registrationDate);
+        return date.toLocaleDateString('ru', {
+            hour: 'numeric',
+            minute: 'numeric',
+        });
+    }, [UserInfo.registrationDate]);
 
     return (
         <div className="userManagement">
@@ -34,6 +41,8 @@ const UserManagement: React.FC<PropsType> = props => {
                 </div>
 
                 <div className="userManagement__roles">Роли: {userRoles}</div>
+
+                <div className="userManagement__roles">Дата регистрации: {registrationDate}</div>
             </Section>
 
             <Section title="Смена пароля">
