@@ -9,7 +9,7 @@ import { getUser, getUsers, getUsersCount, updateUser } from '../../db/users.js'
 import { getSession } from '../../db/sessions.js';
 
 import type { LoginQueryParamsType } from './auth-routes.types.js';
-import type { ChangePasswordQueryParamsType } from './user-routes.types.js';
+import type { CurrentUserInfoQueryResponseType, ChangePasswordQueryParamsType } from './user-routes.types.js';
 
 const routes: FastifyPluginAsync = async (app, options) => {
     const CreateAdminUserSchema: FastifySchema = {
@@ -66,11 +66,23 @@ const routes: FastifyPluginAsync = async (app, options) => {
                 return;
             }
 
-            res.status(200).send({
+            const rolesArray = user.roles.map(roleId => {
+                const userRole: CurrentUserInfoQueryResponseType['roles'][0] = {
+                    id: roleId,
+                    title: UserRoles[roleId],
+                };
+
+                return userRole;
+            });
+
+            const CurrentUserInfo: CurrentUserInfoQueryResponseType = {
                 id: user._id,
                 username: user.user_name,
-                roles: user.roles,
-            });
+                roles: rolesArray,
+                registrationDate: user.registration_date.toISOString(),
+            };
+
+            res.status(200).send(CurrentUserInfo);
         }
     );
 

@@ -13,6 +13,7 @@ export type UserType = {
     roles: UserRoles[];
     password_hash: string;
     password_salt: string;
+    registration_date: Date;
 };
 
 export type UserWithIdType = WithId<UserType>;

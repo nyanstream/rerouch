@@ -8,13 +8,11 @@ import { createMongoClient } from './common.js';
 
 const SESSIONS_COLLECTION = 'sessions';
 
-const client = await createMongoClient();
-
 export type SessionType = {
     cookie: string;
     user_id: string;
-    auth_date: string;
-    auth_end_date: string;
+    auth_date: Date;
+    auth_end_date: Date;
 };
 
 type NewSessionType = {
@@ -23,22 +21,21 @@ type NewSessionType = {
 };
 
 export const createSession = async (userId: SessionType['user_id']) => {
+    const client = await createMongoClient();
+
     try {
         await client.connect();
 
         const currentDate = new Date();
         const tomorrowDate = addDaysToDate(currentDate, 1);
 
-        const authDate = currentDate.toISOString();
-        const authEndDate = tomorrowDate.toISOString();
-
-        const newCookie = getSessionCookieValue(userId, authDate);
+        const newCookie = getSessionCookieValue(userId, currentDate);
 
         const sessionData: SessionType = {
             cookie: newCookie,
             user_id: userId,
-            auth_date: authDate,
-            auth_end_date: authEndDate,
+            auth_date: currentDate,
+            auth_end_date: tomorrowDate,
         };
 
         const sessions = client.db().collection<SessionType>(SESSIONS_COLLECTION);
@@ -58,6 +55,8 @@ export const createSession = async (userId: SessionType['user_id']) => {
 };
 
 export const getSession = async (filter: Filter<SessionType>) => {
+    const client = await createMongoClient();
+
     try {
         await client.connect();
 
@@ -71,6 +70,8 @@ export const getSession = async (filter: Filter<SessionType>) => {
 };
 
 export const getSessions = async (filter: Filter<SessionType>) => {
+    const client = await createMongoClient();
+
     try {
         await client.connect();
 
@@ -84,6 +85,8 @@ export const getSessions = async (filter: Filter<SessionType>) => {
 };
 
 export const extendSession = async (filter: Filter<SessionType>) => {
+    const client = await createMongoClient();
+
     try {
         await client.connect();
 
@@ -103,6 +106,8 @@ export const extendSession = async (filter: Filter<SessionType>) => {
 };
 
 export const deleteSessions = async (filter: Filter<SessionType>) => {
+    const client = await createMongoClient();
+
     try {
         await client.connect();
 
@@ -115,6 +120,8 @@ export const deleteSessions = async (filter: Filter<SessionType>) => {
 };
 
 export const clearOldSessions = async () => {
+    const client = await createMongoClient();
+
     try {
         await client.connect();
 
@@ -129,7 +136,7 @@ export const clearOldSessions = async () => {
 
         const sessionsToDelete = sessionsArray
             .filter(session => {
-                const authEndDate = new Date(session.auth_end_date);
+                const authEndDate = session.auth_end_date;
                 return +authEndDate < +currentDate;
             })
             .map(session => new ObjectId(session._id));

@@ -25,10 +25,12 @@ export const getHashedPasswordData = (password: string, existingSalt?: string) =
     return data;
 };
 
-export const getSessionCookieValue = (userId: string, auth_date: string) => {
+export const getSessionCookieValue = (userId: string, authDate: Date) => {
     const hash = createHash('sha256');
 
-    const salt = `${userId}@${auth_date}`;
+    const authDateString = authDate.toISOString();
+
+    const salt = `${userId}@${authDateString}`;
 
     const value = hash.update(salt).digest('hex');
 

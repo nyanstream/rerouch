@@ -6,15 +6,18 @@ import { UserType, UserRoles } from './users.types.js';
 
 const USERS_COLLECTION = 'users';
 
-const client = await createMongoClient();
+export const createUser = async (userDocument: Omit<UserType, 'roles' | 'registration_date'>, roles: UserRoles[] = [UserRoles.guest]) => {
+    const client = await createMongoClient();
 
-export const createUser = async (userDocument: Omit<UserType, 'roles'>, roles: UserRoles[] = [UserRoles.guest]) => {
     try {
         await client.connect();
+
+        const currentDate = new Date();
 
         const userDocumentWithGuestRole: UserType = {
             ...userDocument,
             roles,
+            registration_date: currentDate,
         };
 
         const users = client.db().collection<UserType>(USERS_COLLECTION);
@@ -29,6 +32,8 @@ export const createUser = async (userDocument: Omit<UserType, 'roles'>, roles: U
 };
 
 export const getUser = async (filter: Filter<UserType>) => {
+    const client = await createMongoClient();
+
     try {
         await client.connect();
 
@@ -42,6 +47,8 @@ export const getUser = async (filter: Filter<UserType>) => {
 };
 
 export const getUsers = async (filter: Filter<UserType> = {}) => {
+    const client = await createMongoClient();
+
     try {
         await client.connect();
 
@@ -55,6 +62,8 @@ export const getUsers = async (filter: Filter<UserType> = {}) => {
 };
 
 export const getUsersCount = async (filter: Filter<UserType> = {}) => {
+    const client = await createMongoClient();
+
     try {
         await client.connect();
 
@@ -68,6 +77,8 @@ export const getUsersCount = async (filter: Filter<UserType> = {}) => {
 };
 
 export const updateUser = async (filter: Filter<UserType>, updateDoc: UpdateFilter<UserType>) => {
+    const client = await createMongoClient();
+
     try {
         await client.connect();
 
