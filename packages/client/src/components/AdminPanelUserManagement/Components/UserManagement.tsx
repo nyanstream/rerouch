@@ -18,7 +18,7 @@ const UserManagement: React.FC<PropsType> = props => {
         return (
             <ul>
                 {UserInfo.roles.map(roleId => (
-                    <li>{UserRoles[roleId]}</li>
+                    <li key={roleId}>{UserRoles[roleId]}</li>
                 ))}
             </ul>
         );
