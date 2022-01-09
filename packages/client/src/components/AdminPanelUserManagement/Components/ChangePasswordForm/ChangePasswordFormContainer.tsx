@@ -23,9 +23,7 @@ const ChangePasswordFormContainer: React.FC = () => {
             const content = success ? 'Пароль успешно сменён' : 'Ошибка!';
             const type = success ? 'success' : 'error';
 
-            toast[type](content, {
-                position: 'top-center',
-            });
+            toast[type](content);
         }
     }, [ChangePasswordQueryResult]);
 

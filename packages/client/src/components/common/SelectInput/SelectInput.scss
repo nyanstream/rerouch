@@ -1,0 +1,28 @@
+.rr-formItem {
+    $formItem: &;
+
+    &--select {
+        display: flex;
+
+        align-items: center;
+
+        gap: 10px;
+
+        #{$formItem}__label {
+            line-height: 1em;
+
+            span {
+                &::after {
+                    content: ':';
+                }
+            }
+        }
+
+        #{$formItem}__input {
+            width: 100%;
+            max-width: 150px;
+
+            padding: 2.5px 5px;
+        }
+    }
+}

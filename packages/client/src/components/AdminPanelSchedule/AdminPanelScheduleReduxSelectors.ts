@@ -2,12 +2,17 @@ import { createSelector } from '@reduxjs/toolkit';
 
 import type { RootStateType } from '../../redux/rootReducer';
 
-export const getIsChangePasswordQueryPending = createSelector(
-    (state: RootStateType) => state.adminPanelUserManagement.IsChangePasswordQueryPending,
-    IsChangePasswordQueryPending => IsChangePasswordQueryPending
+export const getStreamersData = createSelector(
+    (state: RootStateType) => state.adminPanelSchedule.StreamersData,
+    StreamersData => StreamersData
 );
 
-export const getChangePasswordQueryResult = createSelector(
-    (state: RootStateType) => state.adminPanelUserManagement.ChangePasswordQueryResult,
-    ChangePasswordQueryResult => ChangePasswordQueryResult
+export const getIsCreateAirQueryPending = createSelector(
+    (state: RootStateType) => state.adminPanelSchedule.IsCreateAirQueryPending,
+    IsCreateAirQueryPending => IsCreateAirQueryPending
+);
+
+export const getCreateAirQueryResult = createSelector(
+    (state: RootStateType) => state.adminPanelSchedule.CreateAirQueryResult,
+    CreateAirQueryResult => CreateAirQueryResult
 );

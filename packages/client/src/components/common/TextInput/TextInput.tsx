@@ -1,22 +1,22 @@
 import classnames from 'classnames';
-import type { FieldInputProps, FormikFormProps } from 'formik';
+import type { FieldInputProps } from 'formik';
 
 import './TextInput.scss';
 
 type PropsTyp = {
-    form: any;
     field: FieldInputProps<any>;
     type?: string;
     placeholder?: string;
-    label?: string;
+    label?: React.ReactNode;
     labelHidden?: boolean;
+    extra?: React.ReactNode;
     required?: boolean;
     className?: string;
 };
 
 export const TextInput: React.FC<PropsTyp> = props => {
     const { field } = props;
-    const { type = 'text', placeholder, label, labelHidden } = props;
+    const { type = 'text', placeholder, label, labelHidden, extra } = props;
     const { className, required } = props;
 
     const renderLabel = () => {
@@ -31,6 +31,14 @@ export const TextInput: React.FC<PropsTyp> = props => {
         );
     };
 
+    const renderExtra = () => {
+        if (!extra) {
+            return null;
+        }
+
+        return <div className={classnames('rr-formItem__extra', { [`${className}__extra`]: !!className })}>{extra}</div>;
+    };
+
     return (
         <div className={classnames('rr-formItem', 'rr-formItem--textInput', className)} data-type={type}>
             {renderLabel()}
@@ -38,8 +46,11 @@ export const TextInput: React.FC<PropsTyp> = props => {
             <input
                 {...field}
                 {...{ type, required, placeholder }}
+                id={field.name}
                 className={classnames('rr-formItem__input', { [`${className}__input`]: !!className })}
             />
+
+            {renderExtra()}
         </div>
     );
 };

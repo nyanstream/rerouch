@@ -1,0 +1,28 @@
+.schedule__createAirForm {
+    &__formItem {
+        &:not(:first-child) {
+            margin-top: 15px;
+        }
+    }
+
+    &__textPreview {
+        margin-top: 10px;
+
+        & > p {
+            font-size: 0.8em;
+        }
+
+        div {
+            margin-top: 5px;
+            padding: 10px;
+
+            border: 1px solid #e7e7e7;
+
+            word-wrap: break-word;
+        }
+    }
+
+    &__submitBox {
+        margin-top: 15px;
+    }
+}

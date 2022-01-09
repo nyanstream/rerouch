@@ -39,6 +39,8 @@ const InnitialState: AdminPanelScheduleStateType = {
     IsScheduleDataPending: false,
     ScheduleAirsCount: null,
     IsScheduleAirsCountPending: false,
+    CreateAirQueryResult: null,
+    IsCreateAirQueryPending: false,
 };
 
 const AdminPanelSchedule = createSlice({
@@ -85,6 +87,25 @@ const AdminPanelSchedule = createSlice({
         });
         builder.addCase(getAirsCountThunk.rejected, (state, action) => {
             state.IsScheduleAirsCountPending = false;
+            console.warn(action.error);
+        });
+
+        builder.addCase(createAirThunk.pending, (state, action) => {
+            state.IsCreateAirQueryPending = true;
+        });
+        builder.addCase(createAirThunk.fulfilled, (state, action) => {
+            state.IsCreateAirQueryPending = false;
+            state.CreateAirQueryResult = {
+                timestamp: new Date().toISOString(),
+                success: true,
+            };
+        });
+        builder.addCase(createAirThunk.rejected, (state, action) => {
+            state.IsCreateAirQueryPending = false;
+            state.CreateAirQueryResult = {
+                timestamp: new Date().toISOString(),
+                success: false,
+            };
             console.warn(action.error);
         });
     },

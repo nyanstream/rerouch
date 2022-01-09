@@ -6,9 +6,18 @@
             border: 1px solid #cbcbcb;
         }
 
+        #{$formItem}__label:not([hidden]) ~ #{$formItem}__input {
+            margin-top: 10px;
+        }
+
         #{$formItem}__input {
             width: 100%;
             padding: 10px;
+        }
+
+        #{$formItem}__extra {
+            margin-top: 5px;
+            font-size: 0.85em;
         }
     }
 }
