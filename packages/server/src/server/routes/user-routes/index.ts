@@ -96,6 +96,8 @@ const routes: FastifyPluginAsync = async app => {
                 registration_date: user.registration_date.toISOString(),
             };
 
+            console.log(CurrentUserInfo);
+
             res.status(200).send(CurrentUserInfo);
         }
     );
@@ -119,7 +121,7 @@ const routes: FastifyPluginAsync = async app => {
         }
     );
 
-    const StreametsSchema: FastifySchema = {
+    const StreamersSchema: FastifySchema = {
         tags: swaggerTags,
         response: {
             200: StreamersResponseSchema,
@@ -129,7 +131,7 @@ const routes: FastifyPluginAsync = async app => {
     app.get(
         '/get-streamers',
         {
-            schema: StreametsSchema,
+            schema: StreamersSchema,
             preHandler: app.auth([(app as any).verifyStreamerUserSession]),
         },
         async (req, res) => {

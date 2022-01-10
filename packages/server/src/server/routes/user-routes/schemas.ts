@@ -1,5 +1,6 @@
 import type { JSONSchemaType } from 'ajv';
 
+import type { UserRoleType } from './types.js';
 import type { FormattedUserType } from './types.js';
 import type { CreateAdminUserQueryParamsType, CreateAdminUserQueryResponseType } from './types.js';
 import type { CurrentUserInfoQueryResponseType } from './types.js';
@@ -7,9 +8,24 @@ import type { StreamersQueryResponseType } from './types.js';
 import type { RolesQueryResponseType } from './types.js';
 import type { ChangePasswordQueryParamsType } from './types.js';
 
+const RoleSchema: JSONSchemaType<UserRoleType> = {
+    type: 'object',
+    required: ['id', 'title'],
+    properties: {
+        id: { type: 'integer' },
+        title: { type: 'string' },
+    },
+};
+
 const UserSchema: JSONSchemaType<FormattedUserType> = {
     type: 'object',
     required: ['id', 'user_name', 'roles', 'registration_date'],
+    properties: {
+        id: { type: 'string' },
+        user_name: { type: 'string' },
+        roles: { type: 'array', items: RoleSchema },
+        registration_date: { type: 'string' },
+    },
 };
 
 // create-admin-user-if-no-one-exists
@@ -36,14 +52,7 @@ export const CreateAdminUserResponseSchema: JSONSchemaType<CreateAdminUserQueryR
 
 export const RolesResponseSchema: JSONSchemaType<RolesQueryResponseType> = {
     type: 'array',
-    items: {
-        type: 'object',
-        required: ['id', 'title'],
-        properties: {
-            id: { type: 'integer' },
-            title: { type: 'string' },
-        },
-    },
+    items: RoleSchema,
 };
 
 // get-streamers
