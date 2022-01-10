@@ -1,27 +1,23 @@
 import { UserRoles } from '../db/users.types.js';
 import { createUser as createDbUser } from '../db/users.js';
 
-import { UserRoleType } from '../server/routes/user-routes.types.js';
+import { UserRoleType } from '../server/routes/user-routes/types.js';
 
 import { getHashedPasswordData } from './crypto.js';
 
-export const createUser = async (username: string, password: string, roles: UserRoles[]) => {
-    try {
-        const passwordData = getHashedPasswordData(password);
+export const createUser = async (user_name: string, password: string, roles: UserRoles[]) => {
+    const passwordData = getHashedPasswordData(password);
 
-        const userId = await createDbUser(
-            {
-                user_name: username,
-                password_hash: passwordData.hash,
-                password_salt: passwordData.salt,
-            },
-            roles
-        );
+    const userId = await createDbUser(
+        {
+            user_name,
+            password_hash: passwordData.hash,
+            password_salt: passwordData.salt,
+        },
+        roles
+    );
 
-        return userId;
-    } catch (err) {
-        console.warn(err);
-    }
+    return userId;
 };
 
 export const createUserRolesArray = (rolesId: UserRoles[]) => {

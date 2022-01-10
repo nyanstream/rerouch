@@ -1,23 +1,19 @@
 import type { FastifyPluginAsync, FastifySchema } from 'fastify';
 
-import { getHashedPasswordData } from '../../utils/crypto.js';
+import { getHashedPasswordData } from '../../../utils/crypto.js';
 
-import { getUser } from '../../db/users.js';
-import { createSession, deleteSessions } from '../../db/sessions.js';
+import { getUser } from '../../../db/users.js';
+import { createSession, deleteSessions } from '../../../db/sessions.js';
 
-import type { LoginQueryParamsType } from './auth-routes.types.js';
+import type { LoginQueryParamsType } from './types.js';
+import { LoginParamsSchema } from './schemas.js';
 
-const routes: FastifyPluginAsync = async (app, options) => {
+const swaggerTags: string[] = ['auth'];
+
+const routes: FastifyPluginAsync = async app => {
     const LoginSchema: FastifySchema = {
-        body: {
-            type: 'object',
-            required: ['username', 'password', 'captcha'],
-            properties: {
-                username: { type: 'string' },
-                password: { type: 'string' },
-                captcha: { type: 'string' },
-            },
-        },
+        tags: swaggerTags,
+        body: LoginParamsSchema,
     };
 
     app.post('/login', { schema: LoginSchema }, async (req, res) => {
@@ -51,10 +47,14 @@ const routes: FastifyPluginAsync = async (app, options) => {
         res.status(200).send();
     });
 
+    const LogoutSchema: FastifySchema = {
+        tags: swaggerTags,
+    };
+
     app.post(
         '/logout',
         {
-            schema: {},
+            schema: LogoutSchema,
             preHandler: app.auth([(app as any).verifySession]),
         },
         async (req, res) => {
@@ -68,10 +68,14 @@ const routes: FastifyPluginAsync = async (app, options) => {
         }
     );
 
+    const AuthCheckSchema: FastifySchema = {
+        tags: swaggerTags,
+    };
+
     app.head(
         '/check',
         {
-            schema: {},
+            schema: AuthCheckSchema,
             preHandler: app.auth([(app as any).verifySession]),
         },
         async (req, res) => {

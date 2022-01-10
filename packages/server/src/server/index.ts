@@ -5,13 +5,25 @@ import FastifyHelmetPlugin from 'fastify-helmet';
 import FastifyCookiePlugin from 'fastify-cookie';
 import FastifyStaticPlugin from 'fastify-static';
 import FastifySwaggerPlugin from 'fastify-swagger';
+import FastifyAjvCompilerPlugin from '@fastify/ajv-compiler';
+
+import AjvFormats from 'ajv-formats';
 
 import CONFIG from '../config.js';
 
 import { appRoutes, authRoutes, scheduleRoutes, userRoutes } from './routes/index.js';
 import { verifySession, verifyStreamerUserSession, verifyAdminUserSession, verifyCaptcha } from './auth-decorators.js';
 
-const app = Fastify();
+const app = Fastify({
+    ajv: {
+        plugins: [[AjvFormats, { mode: 'fast' }] as any],
+    },
+    schemaController: {
+        compilersFactory: {
+            buildValidator: FastifyAjvCompilerPlugin() as any,
+        },
+    },
+});
 
 app.register(FastifyAuthPlugin);
 app.register(FastifyCorsPlugin);
