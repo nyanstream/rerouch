@@ -26,18 +26,18 @@ const UserManagement: React.FC<PropsType> = props => {
     }, [UserInfo.roles]);
 
     const registrationDate = useMemo(() => {
-        const date = new Date(UserInfo.registrationDate);
+        const date = new Date(UserInfo.registration_date);
         return date.toLocaleDateString('ru', {
             hour: 'numeric',
             minute: 'numeric',
         });
-    }, [UserInfo.registrationDate]);
+    }, [UserInfo.registration_date]);
 
     return (
         <div className="userManagement">
             <Section title="Информация о пользователе">
                 <div>
-                    Имя пользователя: <strong>{UserInfo.username}</strong>
+                    Имя пользователя: <strong>{UserInfo.user_name}</strong>
                 </div>
 
                 <div className="userManagement__roles">Роли: {userRoles}</div>

@@ -1,15 +1,20 @@
-import { useRef, useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Formik, Form, Field, FormikHelpers } from 'formik';
+// import dayjs from 'dayjs';
+
+import { formatDateToDateTimeInput } from '../../../../utils/dates';
 
 import type { StreamersQueryResponseType } from '../../../../api/services/userService/types';
 import type { CreateAirQueryParamsType } from '../../../../api/services/scheduleService/types';
 
-import { CreateAirValidationSchema } from '../../logic/validationSchemas';
+import type { CreateAirFormValuesType } from './logic/validationSchemas';
+import { CreateAirValidationSchema } from './logic/validationSchemas';
 
-import { Markdown, TextInput, SelectInput, Button, Link } from '../../../common';
+import { Markdown, TextInput, SelectInput, DateTimeInput, Button } from '../../../common';
 import type { SelectInputPropsType } from '../../../common';
 
 import './CreateAirForm.scss';
+import dayjs from 'dayjs';
 
 type PropsType = {
     StreamersData: StreamersQueryResponseType;
@@ -21,18 +26,50 @@ const CreateAirForm: React.FC<PropsType> = props => {
     const { StreamersData, IsCreateAirQueryPending } = props;
     const { handleNewAirData } = props;
 
-    const initialValues = useRef<CreateAirQueryParamsType>({
+    const initialValues: CreateAirFormValuesType = {
         text: '',
-        streamerId: StreamersData[0].id,
-        startDate: '',
-        endDate: '',
+        link: '',
+        streamer_id: '',
+        start_date: formatDateToDateTimeInput(new Date()),
+        duration: 60,
         hidden: false,
-    });
+    };
 
-    const submitHandler = useCallback(async (values: CreateAirQueryParamsType, helpers: FormikHelpers<CreateAirQueryParamsType>) => {
-        console.log(values);
-        // handleNewPassword(values);
-    }, []);
+    const submitHandler = useCallback(
+        async (values: CreateAirFormValuesType, helpers: FormikHelpers<CreateAirFormValuesType>) => {
+            const timeZone = 'Europe/Moscow';
+
+            const link = values.link ?? null;
+            const streamerId = values.streamer_id ? values.streamer_id : null;
+
+            const startDate = dayjs(values.start_date);
+            const endDate = dayjs(values.start_date).add(values.duration, 'minutes');
+
+            const newAirData: CreateAirQueryParamsType = {
+                text: values.text,
+                link,
+                streamer_id: streamerId,
+                start_date: startDate.toISOString(),
+                end_date: endDate.toISOString(),
+                dates_timezone: timeZone,
+                hidden: false,
+            };
+
+            handleNewAirData(newAirData);
+
+            helpers.resetForm({
+                values: {
+                    text: '',
+                    link: '',
+                    streamer_id: values.streamer_id,
+                    start_date: formatDateToDateTimeInput(endDate),
+                    duration: 60,
+                    hidden: false,
+                },
+            });
+        },
+        [handleNewAirData]
+    );
 
     const renderMarkdownPreview = useCallback((text: string) => {
         if (!text) {
@@ -43,25 +80,32 @@ const CreateAirForm: React.FC<PropsType> = props => {
             <div className="schedule__createAirForm__textPreview" aria-hidden>
                 <p>Превью:</p>
                 <div>
-                    <Markdown>{text}</Markdown>
+                    <Markdown input={text} />
                 </div>
             </div>
         );
     }, []);
 
     const streamersOptions = useMemo(() => {
-        return StreamersData.map(streamerData => {
+        const nullOption: SelectInputPropsType['options'][0] = {
+            value: '',
+            title: 'Неизвестно',
+        };
+
+        const options = StreamersData.map(streamerData => {
             const option: SelectInputPropsType['options'][0] = {
                 value: streamerData.id,
-                title: streamerData.username,
+                title: streamerData.user_name,
             };
 
             return option;
         });
+
+        return [nullOption, ...options];
     }, [StreamersData]);
 
     return (
-        <Formik initialValues={initialValues.current} onSubmit={submitHandler} validationSchema={CreateAirValidationSchema}>
+        <Formik initialValues={initialValues} onSubmit={submitHandler} validationSchema={CreateAirValidationSchema}>
             {({ isSubmitting, dirty, isValidating, isValid, values }) => {
                 const isSubmitDisabled = IsCreateAirQueryPending || isSubmitting || isValidating || !isValid || !dirty;
 
@@ -72,11 +116,7 @@ const CreateAirForm: React.FC<PropsType> = props => {
                             className="schedule__createAirForm__formItem"
                             label="Название эфира"
                             placeholder="Введите название эфира"
-                            extra={
-                                <>
-                                    Поддерживается базовый <Link href="https://guides.hexlet.io/markdown/">Markdown</Link>.
-                                </>
-                            }
+                            extra="Поддерживается разметка: **bold**, *курсив*, ~~зачёркнутый~~."
                             required
                             component={TextInput}
                         />
@@ -84,7 +124,7 @@ const CreateAirForm: React.FC<PropsType> = props => {
                         {renderMarkdownPreview(values.text)}
 
                         <Field
-                            name="streamerId"
+                            name="streamer_id"
                             className="schedule__createAirForm__formItem"
                             options={streamersOptions}
                             label="Стример"
@@ -93,18 +133,30 @@ const CreateAirForm: React.FC<PropsType> = props => {
                         />
 
                         <Field
-                            name="startDate"
+                            name="start_date"
                             className="schedule__createAirForm__formItem"
                             label="Дата начала эфира"
+                            extra="Время должно быть московским."
+                            required
+                            component={DateTimeInput}
+                        />
+
+                        <Field
+                            name="duration"
+                            type="number"
+                            className="schedule__createAirForm__formItem"
+                            label="Продолжительность эфира (в минутах)"
                             required
                             component={TextInput}
                         />
 
                         <Field
-                            name="startDate"
+                            name="link"
+                            type="url"
                             className="schedule__createAirForm__formItem"
-                            label="Дата окончания эфира"
-                            required
+                            label="Ссылка"
+                            placeholder="https://shikimori.org/animes/1639"
+                            extra="Необязательно, но желательно."
                             component={TextInput}
                         />
 

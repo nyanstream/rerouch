@@ -7,7 +7,7 @@
         }
 
         #{$formItem}__label:not([hidden]) ~ #{$formItem}__input {
-            margin-top: 10px;
+            margin-top: 5px;
         }
 
         #{$formItem}__input {

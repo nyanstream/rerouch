@@ -1,0 +1,32 @@
+.rr-formItem {
+    $formItem: &;
+
+    &--dateTime {
+        #{$formItem}__content {
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+        }
+
+        #{$formItem}__label {
+            line-height: 1em;
+
+            span {
+                &::after {
+                    content: ':';
+                }
+            }
+        }
+
+        #{$formItem}__input {
+            padding: 2.5px 5px;
+        }
+
+        #{$formItem}__extra {
+            margin-top: 5px;
+            font-size: 0.85em;
+        }
+    }
+}
