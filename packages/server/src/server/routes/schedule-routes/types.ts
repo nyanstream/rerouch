@@ -20,7 +20,9 @@ export type AirsCountQueryResponseType = {
     count: number;
 };
 
-export type CreateAirQueryParamsType = Omit<FormattedAirType, 'id' | 'streamer_name'>;
+export type CreateAirQueryParamsType = Omit<FormattedAirType, 'id' | 'streamer_name'> & {
+    dates_timezone: string;
+};
 
 export type CreateAirQueryResponseType = {
     id: string;

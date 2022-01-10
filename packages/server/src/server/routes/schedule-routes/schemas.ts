@@ -55,15 +55,17 @@ export const AirsCountResponseSchema: JSONSchemaType<AirsCountQueryResponseType>
 
 export const CreateAirParamsSchema: JSONSchemaType<CreateAirQueryParamsType> = {
     type: 'object',
-    required: ['text', 'start_date', 'end_date', 'hidden'],
+    required: ['text', 'start_date', 'end_date', 'dates_timezone', 'hidden'],
     properties: {
         text: { type: 'string' },
         link: { type: 'string', nullable: true },
         streamer_id: { type: 'string', nullable: true },
         start_date: { type: 'string' },
         end_date: { type: 'string' },
+        dates_timezone: { type: 'string' },
         hidden: { type: 'boolean' },
     },
+    additionalProperties: false,
 };
 
 export const CreateAirResponseSchema: JSONSchemaType<CreateAirQueryResponseType> = {

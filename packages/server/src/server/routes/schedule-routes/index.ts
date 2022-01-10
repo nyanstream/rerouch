@@ -2,6 +2,7 @@ import { ObjectId } from 'mongodb';
 import type { FastifyPluginAsync, FastifySchema } from 'fastify';
 
 import { parseMarkdown } from '../../../utils/markdown.js';
+import { getStandardDateFromDateWithTimezone } from '../../../utils/dates.js';
 
 import { getSchedule, getAirsCount, createAir, updateAir } from '../../../db/schedule.js';
 import { AirType } from '../../../db/schedule.types.js';
@@ -127,9 +128,11 @@ const routes: FastifyPluginAsync = async app => {
                 }
             }
 
+            const datesTimezone = requestBody.dates_timezone;
+
             const newAirInfo: AirType = {
-                start_date: new Date(requestBody.start_date),
-                end_date: new Date(requestBody.end_date),
+                start_date: getStandardDateFromDateWithTimezone(requestBody.start_date, datesTimezone),
+                end_date: getStandardDateFromDateWithTimezone(requestBody.end_date, datesTimezone),
                 text: requestBody.text,
                 link: requestBody.link,
                 streamer_id: streamerUserId,
