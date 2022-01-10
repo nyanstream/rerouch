@@ -60,7 +60,6 @@ export const CreateAirParamsSchema: JSONSchemaType<CreateAirQueryParamsType> = {
         text: { type: 'string' },
         link: { type: 'string', nullable: true },
         streamer_id: { type: 'string', nullable: true },
-        streamer_name: { type: 'string', nullable: true },
         start_date: { type: 'string' },
         end_date: { type: 'string' },
         hidden: { type: 'boolean' },

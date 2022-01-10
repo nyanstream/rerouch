@@ -96,8 +96,6 @@ const routes: FastifyPluginAsync = async app => {
                 registration_date: user.registration_date.toISOString(),
             };
 
-            console.log(CurrentUserInfo);
-
             res.status(200).send(CurrentUserInfo);
         }
     );
