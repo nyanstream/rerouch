@@ -1,6 +1,8 @@
 import { ObjectId } from 'mongodb';
 import type { FastifyPluginAsync, FastifySchema } from 'fastify';
 
+import { parseMarkdown } from '../../../utils/markdown.js';
+
 import { getSchedule, getAirsCount, createAir, updateAir } from '../../../db/schedule.js';
 import { AirType } from '../../../db/schedule.types.js';
 
@@ -45,7 +47,7 @@ const routes: FastifyPluginAsync = async app => {
             const responseObject = schedule.map(airInfo => {
                 const formattedAirInfo: ScheduleQueryResponseType[0] = {
                     id: airInfo._id.toString(),
-                    text: airInfo.text,
+                    text: parseMarkdown(airInfo.text),
                     link: airInfo.link,
                     streamer_id: airInfo.streamer_id,
                     streamer_name: airInfo.streamer_name,
