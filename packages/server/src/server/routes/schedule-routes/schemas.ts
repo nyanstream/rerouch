@@ -8,10 +8,11 @@ import type { EditAirQueryParamsType } from './types.js';
 
 const FormattedAirSchema: JSONSchemaType<FormattedAirType> = {
     type: 'object',
-    required: ['id', 'text', 'start_date', 'end_date', 'hidden'],
+    required: ['id', 'text', 'text_html', 'start_date', 'end_date', 'hidden'],
     properties: {
         id: { type: 'string' },
         text: { type: 'string' },
+        text_html: { type: 'string' },
         link: { type: 'string', nullable: true },
         streamer_id: { type: 'string', nullable: true },
         streamer_name: { type: 'string', nullable: true },
@@ -32,7 +33,7 @@ export const ScheduleParamsSchema: JSONSchemaType<ScheduleQueryParamsType> = {
     additionalProperties: false,
 };
 
-export const ScheduleResponseSchema: JSONSchemaType<ScheduleQueryResponseType>[''] = {
+export const ScheduleResponseSchema: JSONSchemaType<ScheduleQueryResponseType> = {
     type: 'array',
     items: FormattedAirSchema,
 };
@@ -78,4 +79,18 @@ export const CreateAirResponseSchema: JSONSchemaType<CreateAirQueryResponseType>
 
 // /edit-air
 
-export const EditAirQueryParamsSchema: JSONSchemaType<EditAirQueryParamsType> = FormattedAirSchema;
+export const EditAirQueryParamsSchema: JSONSchemaType<EditAirQueryParamsType> = {
+    type: 'object',
+    required: ['id', 'text', 'start_date', 'end_date', 'dates_timezone', 'hidden'],
+    properties: {
+        id: { type: 'string' },
+        text: { type: 'string' },
+        link: { type: 'string', nullable: true },
+        streamer_id: { type: 'string', nullable: true },
+        start_date: { type: 'string' },
+        end_date: { type: 'string' },
+        dates_timezone: { type: 'string' },
+        hidden: { type: 'boolean' },
+    },
+    additionalProperties: false,
+};

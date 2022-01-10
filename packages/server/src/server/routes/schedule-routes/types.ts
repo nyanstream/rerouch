@@ -1,5 +1,6 @@
 export type FormattedAirType = {
     id: string;
+    text_html: string;
     text: string;
     link: string | null;
     streamer_id: string | null;
@@ -20,7 +21,7 @@ export type AirsCountQueryResponseType = {
     count: number;
 };
 
-export type CreateAirQueryParamsType = Omit<FormattedAirType, 'id' | 'streamer_name'> & {
+export type CreateAirQueryParamsType = Omit<FormattedAirType, 'id' | 'text_html' | 'streamer_name'> & {
     dates_timezone: string;
 };
 
@@ -28,4 +29,4 @@ export type CreateAirQueryResponseType = {
     id: string;
 };
 
-export type EditAirQueryParamsType = FormattedAirType;
+export type EditAirQueryParamsType = CreateAirQueryParamsType & Pick<FormattedAirType, 'id'>;

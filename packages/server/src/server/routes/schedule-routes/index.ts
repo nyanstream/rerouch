@@ -48,7 +48,8 @@ const routes: FastifyPluginAsync = async app => {
             const responseObject = schedule.map(airInfo => {
                 const formattedAirInfo: ScheduleQueryResponseType[0] = {
                     id: airInfo._id.toString(),
-                    text: parseMarkdown(airInfo.text),
+                    text: airInfo.text,
+                    text_html: parseMarkdown(airInfo.text),
                     link: airInfo.link,
                     streamer_id: airInfo.streamer_id,
                     streamer_name: airInfo.streamer_name,
