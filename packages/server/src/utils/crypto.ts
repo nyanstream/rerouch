@@ -1,28 +1,14 @@
-import { createHmac, createHash } from 'crypto';
-import { nanoid } from 'nanoid';
+import { createHash } from 'crypto';
+import bcrypt from 'bcryptjs';
 
-import CONFIG from '../config.js';
+const SALT_ROUNDS = 10;
 
-type HashedPasswordData = {
-    hash: string;
-    salt: string;
+export const getPasswordHash = async (password: string) => {
+    return await bcrypt.hash(password, SALT_ROUNDS);
 };
 
-export const getHashedPasswordData = (password: string, existingSalt?: string) => {
-    const salt = existingSalt ?? nanoid();
-
-    const combinedSalt = `${CONFIG.password_salt}@${salt}`;
-
-    const hmac = createHmac('sha256', combinedSalt);
-
-    const hash = hmac.update(password).digest('hex');
-
-    const data: HashedPasswordData = {
-        hash,
-        salt,
-    };
-
-    return data;
+export const verifyPassword = async (password: string, hash: string) => {
+    return await bcrypt.compare(password, hash);
 };
 
 export const getSessionCookieValue = (userId: string, authDate: Date) => {

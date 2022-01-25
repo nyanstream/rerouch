@@ -6,8 +6,6 @@ declare global {
             DB_CONNECTION_STRING?: string;
 
             API_RECAPTCHA_SERVER_KEY?: string;
-
-            PASSWORD_SALT?: string;
         }
     }
 }

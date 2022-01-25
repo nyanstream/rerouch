@@ -3,16 +3,15 @@ import { createUser as createDbUser } from '../db/users.js';
 
 import { UserRoleType } from '../server/routes/user-routes/types.js';
 
-import { getHashedPasswordData } from './crypto.js';
+import { getPasswordHash } from './crypto.js';
 
 export const createUser = async (user_name: string, password: string, roles: UserRoles[]) => {
-    const passwordData = getHashedPasswordData(password);
+    const passwordHash = await getPasswordHash(password);
 
     const userId = await createDbUser(
         {
             user_name,
-            password_hash: passwordData.hash,
-            password_salt: passwordData.salt,
+            password_hash: passwordHash,
         },
         roles
     );

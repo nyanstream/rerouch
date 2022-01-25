@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 import type { FastifyPluginAsync, FastifySchema } from 'fastify';
 
 import { createUser, createUserRolesArray, getCompleteUserRolesArray } from '../../../utils/users.js';
-import { getHashedPasswordData } from '../../../utils/crypto.js';
+import { getPasswordHash } from '../../../utils/crypto.js';
 
 import { UserRoles } from '../../../db/users.types.js';
 import { getUser, getUsers, getUsersCount, updateUser } from '../../../db/users.js';
@@ -178,14 +178,13 @@ const routes: FastifyPluginAsync = async app => {
                 return;
             }
 
-            const newPasswordData = getHashedPasswordData(requestBody.password);
+            const newPasswordHash = await getPasswordHash(requestBody.password);
 
             await updateUser(
                 { _id: user._id },
                 {
                     $set: {
-                        password_salt: newPasswordData.salt,
-                        password_hash: newPasswordData.hash,
+                        password_hash: newPasswordHash,
                     },
                 }
             );

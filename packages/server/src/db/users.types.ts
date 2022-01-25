@@ -12,7 +12,6 @@ export type UserType = {
     user_name: string;
     roles: UserRoles[];
     password_hash: string;
-    password_salt: string;
     registration_date: Date;
 };
 

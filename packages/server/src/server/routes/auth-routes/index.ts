@@ -1,6 +1,6 @@
 import type { FastifyPluginAsync, FastifySchema } from 'fastify';
 
-import { getHashedPasswordData } from '../../../utils/crypto.js';
+import { verifyPassword } from '../../../utils/crypto.js';
 
 import { getUser } from '../../../db/users.js';
 import { createSession, deleteSessions } from '../../../db/sessions.js';
@@ -27,9 +27,9 @@ const routes: FastifyPluginAsync = async app => {
             return;
         }
 
-        const passwordData = getHashedPasswordData(RequestBody.password, userInfo.password_salt);
+        const isPasswordValid = await verifyPassword(RequestBody.password, userInfo.password_hash);
 
-        if (passwordData.hash !== userInfo.password_hash) {
+        if (!isPasswordValid) {
             res.status(401).send();
             return;
         }
