@@ -21,6 +21,7 @@
         "@fastify/ajv-compiler": "3.0.0",
         "ajv": "8.9.0",
         "ajv-formats": "2.1.1",
+        "bcryptjs": "2.4.3",
         "cross-fetch": "3.1.5",
         "dayjs": "1.10.7",
         "dotenv": "14.3.0",
@@ -33,10 +34,10 @@
         "fastify-swagger": "4.13.1",
         "markdown-it": "12.3.2",
         "mongodb": "4.3.1",
-        "mongodb-client-encryption": "1.2.7",
-        "nanoid": "3.2.0"
+        "mongodb-client-encryption": "1.2.7"
     },
     "devDependencies": {
+        "@types/bcryptjs": "2.4.2",
         "@types/markdown-it": "12.2.3",
         "esbuild": "0.14.13",
         "nodemon": "2.0.15",
