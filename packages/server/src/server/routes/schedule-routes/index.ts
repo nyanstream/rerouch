@@ -37,7 +37,7 @@ const routes: FastifyPluginAsync = async app => {
         },
     };
 
-    app.get(
+    app.get<{ Querystring: ScheduleQueryParamsType; Reply: ScheduleQueryResponseType }>(
         '/get-schedule',
         {
             schema: ScheduleSchema,
@@ -45,7 +45,7 @@ const routes: FastifyPluginAsync = async app => {
         async (req, res) => {
             await checkUserRoles(req.cookies, streamersRoles);
 
-            const RequestParams = req.query as ScheduleQueryParamsType;
+            const RequestParams = req.query;
 
             const { skip = 0, limit = 20 } = RequestParams;
 
@@ -78,7 +78,7 @@ const routes: FastifyPluginAsync = async app => {
         },
     };
 
-    app.get(
+    app.get<{ Reply: AirsCountQueryResponseType }>(
         '/get-airs-count',
         {
             schema: AirsCountSchema,
@@ -116,7 +116,7 @@ const routes: FastifyPluginAsync = async app => {
         },
     };
 
-    app.post(
+    app.post<{ Body: CreateAirQueryParamsType; Reply: CreateAirQueryResponseType }>(
         '/create-air',
         {
             schema: CreateAirSchema,
@@ -124,7 +124,7 @@ const routes: FastifyPluginAsync = async app => {
         async (req, res) => {
             await checkUserRoles(req.cookies, streamersRoles);
 
-            const requestBody = req.body as CreateAirQueryParamsType;
+            const requestBody = req.body;
 
             const streamerUserId = requestBody.streamer_id;
             let streamerUserName: string | null = null;
@@ -164,7 +164,7 @@ const routes: FastifyPluginAsync = async app => {
         body: EditAirQueryParamsSchema,
     };
 
-    app.patch(
+    app.patch<{ Body: EditAirQueryParamsType }>(
         '/edit-air',
         {
             schema: EditAirSchema,
@@ -172,7 +172,7 @@ const routes: FastifyPluginAsync = async app => {
         async (req, res) => {
             await checkUserRoles(req.cookies, streamersRoles);
 
-            const requestBody = req.body as EditAirQueryParamsType;
+            const requestBody = req.body;
 
             const streamerUserId = requestBody.streamer_id;
             let streamerUserName: string | null = null;

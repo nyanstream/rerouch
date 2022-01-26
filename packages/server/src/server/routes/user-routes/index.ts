@@ -37,13 +37,13 @@ const routes: FastifyPluginAsync = async app => {
         },
     };
 
-    app.post(
+    app.post<{ Body: CreateAdminUserQueryParamsType; Reply: CreateAdminUserQueryResponseType }>(
         '/create-admin-user-if-no-one-exists',
         {
             schema: CreateAdminUserSchema,
         },
         async (req, res) => {
-            const requestBody = req.body as CreateAdminUserQueryParamsType;
+            const requestBody = req.body;
 
             const usersCount = await getUsersCount();
 
@@ -69,7 +69,7 @@ const routes: FastifyPluginAsync = async app => {
         },
     };
 
-    app.get(
+    app.get<{ Reply: CurrentUserInfoQueryResponseType }>(
         '/get-current-user-info',
         {
             schema: CurrentUserInfoSchema,
@@ -97,7 +97,7 @@ const routes: FastifyPluginAsync = async app => {
         },
     };
 
-    app.get(
+    app.get<{ Reply: RolesQueryResponseType }>(
         '/get-roles',
         {
             schema: RolesSchema,
@@ -117,7 +117,7 @@ const routes: FastifyPluginAsync = async app => {
         },
     };
 
-    app.get(
+    app.get<{ Reply: StreamersQueryResponseType }>(
         '/get-streamers',
         {
             schema: StreamersSchema,
@@ -145,13 +145,13 @@ const routes: FastifyPluginAsync = async app => {
         body: ChangePasswordParamsSchema,
     };
 
-    app.patch(
+    app.patch<{ Body: ChangePasswordQueryParamsType }>(
         '/change-password',
         {
             schema: ChangePasswordSchema,
         },
         async (req, res) => {
-            const requestBody = req.body as ChangePasswordQueryParamsType;
+            const requestBody = req.body;
 
             const session = await getUserSessionByCookie(req.cookies);
 

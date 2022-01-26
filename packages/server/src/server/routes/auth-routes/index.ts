@@ -18,16 +18,10 @@ const routes: FastifyPluginAsync = async app => {
         body: LoginParamsSchema,
     };
 
-    app.post('/login', { schema: LoginSchema }, async (req, res) => {
-        const RequestBody = req.body as LoginQueryParamsType;
+    app.post<{ Body: LoginQueryParamsType }>('/login', { schema: LoginSchema }, async (req, res) => {
+        const RequestBody = req.body;
 
         const userInfo = await getUser({ user_name: RequestBody.username });
-
-        // if user not found
-        if (!userInfo) {
-            res.status(404).send();
-            return;
-        }
 
         const isPasswordValid = await verifyPassword(RequestBody.password, userInfo.password_hash);
 

@@ -37,7 +37,7 @@ const routes: FastifyPluginAsync = async app => {
         },
     };
 
-    app.post(
+    app.post<{ Body: ParseMarkdownQueryParamsType; Reply: ParseMarkdownQueryResponseType }>(
         '/parse-markdown',
         {
             schema: ParseMarkdownSchema,
@@ -45,7 +45,7 @@ const routes: FastifyPluginAsync = async app => {
         async (req, res) => {
             await getUserSessionByCookie(req.cookies);
 
-            const requestBody = req.body as ParseMarkdownQueryParamsType;
+            const requestBody = req.body;
 
             const responseObject: ParseMarkdownQueryResponseType = {
                 output: parseMarkdown(requestBody.input),
