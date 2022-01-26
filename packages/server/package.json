@@ -34,7 +34,8 @@
         "fastify-swagger": "4.13.1",
         "markdown-it": "12.3.2",
         "mongodb": "4.3.1",
-        "mongodb-client-encryption": "1.2.7"
+        "mongodb-client-encryption": "1.2.7",
+        "nanoid": "3.2.0"
     },
     "devDependencies": {
         "@types/bcryptjs": "2.4.2",
