@@ -2,6 +2,10 @@ import type { FastifyPluginAsync, FastifySchema } from 'fastify';
 
 import { parseMarkdown } from '../../../utils/markdown.js';
 
+import { UserRoles } from '../../../db/users.types.js';
+
+import { getUserSessionByCookie, checkUserRoles } from '../../utils/auth.js';
+
 import type { ParseMarkdownQueryParamsType, ParseMarkdownQueryResponseType } from './types';
 import { ParseMarkdownParamsSchema, ParseMarkdownResponseSchema } from './schemas.js';
 
@@ -16,9 +20,10 @@ const routes: FastifyPluginAsync = async app => {
         '/shutdown',
         {
             schema: ShutdownSchema,
-            preHandler: app.auth([(app as any).verifyAdminUserSession]),
         },
         async (req, res) => {
+            await checkUserRoles(req.cookies, [UserRoles.admin]);
+
             res.status(200).send();
             process.exit();
         }
@@ -36,9 +41,10 @@ const routes: FastifyPluginAsync = async app => {
         '/parse-markdown',
         {
             schema: ParseMarkdownSchema,
-            preHandler: app.auth([(app as any).verifySession]),
         },
         async (req, res) => {
+            await getUserSessionByCookie(req.cookies);
+
             const requestBody = req.body as ParseMarkdownQueryParamsType;
 
             const responseObject: ParseMarkdownQueryResponseType = {

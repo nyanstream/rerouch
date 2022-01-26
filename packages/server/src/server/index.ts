@@ -1,5 +1,4 @@
 import Fastify from 'fastify';
-import FastifyAuthPlugin from 'fastify-auth';
 import FastifyCorsPlugin from 'fastify-cors';
 import FastifyHelmetPlugin from 'fastify-helmet';
 import FastifyCookiePlugin from 'fastify-cookie';
@@ -12,7 +11,6 @@ import AjvFormats from 'ajv-formats';
 import CONFIG from '../config.js';
 
 import { appRoutes, authRoutes, scheduleRoutes, userRoutes } from './routes/index.js';
-import { verifySession, verifyStreamerUserSession, verifyAdminUserSession, verifyCaptcha } from './auth-decorators.js';
 
 const app = Fastify({
     ajv: {
@@ -25,7 +23,6 @@ const app = Fastify({
     },
 });
 
-app.register(FastifyAuthPlugin);
 app.register(FastifyCorsPlugin);
 
 app.register(FastifyHelmetPlugin, {
@@ -41,11 +38,6 @@ app.register(FastifyHelmetPlugin, {
 });
 
 app.register(FastifyCookiePlugin);
-
-app.decorate('verifySession', verifySession);
-app.decorate('verifyStreamerUserSession', verifyStreamerUserSession);
-app.decorate('verifyAdminUserSession', verifyAdminUserSession);
-app.decorate('verifyCaptcha', verifyCaptcha);
 
 // Swagger
 

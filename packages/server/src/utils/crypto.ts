@@ -1,5 +1,6 @@
 import { createHash } from 'crypto';
 import bcrypt from 'bcryptjs';
+import { nanoid } from 'nanoid/async';
 
 const SALT_ROUNDS = 10;
 
@@ -11,12 +12,12 @@ export const verifyPassword = async (password: string, hash: string) => {
     return await bcrypt.compare(password, hash);
 };
 
-export const getSessionCookieValue = (userId: string, authDate: Date) => {
+export const getSessionCookieValue = async (userId: string) => {
+    const randomId = await nanoid();
+
+    const salt = `${randomId}@${userId}`;
+
     const hash = createHash('sha256');
-
-    const authDateString = authDate.toISOString();
-
-    const salt = `${userId}@${authDateString}`;
 
     const value = hash.update(salt).digest('hex');
 

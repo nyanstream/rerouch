@@ -40,6 +40,10 @@ export const getUser = async (filter: Filter<UserType>) => {
         const users = client.db().collection<UserType>(USERS_COLLECTION);
         const userInfo = await users.findOne(filter);
 
+        if (!userInfo) {
+            throw new Error('User not found');
+        }
+
         return userInfo;
     } finally {
         await client.close();

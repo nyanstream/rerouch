@@ -19,7 +19,7 @@ export const createSession = async (userId: SessionType['user_id']) => {
         const currentDate = new Date();
         const tomorrowDate = addDaysToDate(currentDate, 1);
 
-        const newCookie = getSessionCookieValue(userId, currentDate);
+        const newCookie = await getSessionCookieValue(userId);
 
         const sessionData: SessionType = {
             cookie: newCookie,
@@ -52,6 +52,10 @@ export const getSession = async (filter: Filter<SessionType>) => {
 
         const sessions = client.db().collection<SessionType>(SESSIONS_COLLECTION);
         const sessionInfo = await sessions.findOne(filter);
+
+        if (!sessionInfo) {
+            throw new Error('Session not found');
+        }
 
         return sessionInfo;
     } finally {

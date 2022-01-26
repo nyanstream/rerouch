@@ -6,7 +6,8 @@ import { getPasswordHash } from '../../../utils/crypto.js';
 
 import { UserRoles } from '../../../db/users.types.js';
 import { getUser, getUsers, getUsersCount, updateUser } from '../../../db/users.js';
-import { getSession } from '../../../db/sessions.js';
+
+import { getUserSessionByCookie, checkUserRoles } from '../../utils/auth.js';
 
 import type { CreateAdminUserQueryParamsType, CreateAdminUserQueryResponseType } from './types.js';
 import { CreateAdminUserParamsSchema, CreateAdminUserResponseSchema } from './schemas.js';
@@ -24,6 +25,8 @@ import type { StreamersQueryResponseType } from './types.js';
 import { StreamersResponseSchema } from './schemas.js';
 
 const swaggerTags: string[] = ['user'];
+
+const streamersRoles = [UserRoles.streamer, UserRoles.admin];
 
 const routes: FastifyPluginAsync = async app => {
     const CreateAdminUserSchema: FastifySchema = {
@@ -70,24 +73,11 @@ const routes: FastifyPluginAsync = async app => {
         '/get-current-user-info',
         {
             schema: CurrentUserInfoSchema,
-            preHandler: app.auth([(app as any).verifySession]),
         },
         async (req, res) => {
-            const authCookie = req.cookies['authCookie'];
-
-            const session = await getSession({ cookie: authCookie });
-
-            if (!session) {
-                res.status(500).send();
-                return;
-            }
+            const session = await getUserSessionByCookie(req.cookies);
 
             const user = await getUser({ _id: new ObjectId(session.user_id) });
-
-            if (!user) {
-                res.status(500).send();
-                return;
-            }
 
             const CurrentUserInfo: CurrentUserInfoQueryResponseType = {
                 id: user._id.toString(),
@@ -111,9 +101,10 @@ const routes: FastifyPluginAsync = async app => {
         '/get-roles',
         {
             schema: RolesSchema,
-            preHandler: app.auth([(app as any).verifySession]),
         },
         async (req, res) => {
+            await getUserSessionByCookie(req.cookies);
+
             const responseObject: RolesQueryResponseType = getCompleteUserRolesArray();
             res.status(200).send(responseObject);
         }
@@ -130,9 +121,10 @@ const routes: FastifyPluginAsync = async app => {
         '/get-streamers',
         {
             schema: StreamersSchema,
-            preHandler: app.auth([(app as any).verifyStreamerUserSession]),
         },
         async (req, res) => {
+            await checkUserRoles(req.cookies, streamersRoles);
+
             const users = await getUsers({ roles: UserRoles.streamer });
 
             const streamers = users.map(user => {
@@ -157,26 +149,13 @@ const routes: FastifyPluginAsync = async app => {
         '/change-password',
         {
             schema: ChangePasswordSchema,
-            preHandler: app.auth([(app as any).verifySession]),
         },
         async (req, res) => {
             const requestBody = req.body as ChangePasswordQueryParamsType;
 
-            const authCookie = req.cookies['authCookie'];
-
-            const session = await getSession({ cookie: authCookie });
-
-            if (!session) {
-                res.status(500).send();
-                return;
-            }
+            const session = await getUserSessionByCookie(req.cookies);
 
             const user = await getUser({ _id: new ObjectId(session.user_id) });
-
-            if (!user) {
-                res.status(500).send();
-                return;
-            }
 
             const newPasswordHash = await getPasswordHash(requestBody.password);
 

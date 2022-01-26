@@ -5,6 +5,8 @@ import { verifyPassword } from '../../../utils/crypto.js';
 import { getUser } from '../../../db/users.js';
 import { createSession, deleteSessions } from '../../../db/sessions.js';
 
+import { getUserSessionByCookie } from '../../utils/auth.js';
+
 import type { LoginQueryParamsType } from './types.js';
 import { LoginParamsSchema } from './schemas.js';
 
@@ -55,12 +57,11 @@ const routes: FastifyPluginAsync = async app => {
         '/logout',
         {
             schema: LogoutSchema,
-            preHandler: app.auth([(app as any).verifySession]),
         },
         async (req, res) => {
-            const authCookie = req.cookies['authCookie'];
+            const session = await getUserSessionByCookie(req.cookies);
 
-            await deleteSessions({ cookie: authCookie });
+            await deleteSessions({ _id: session._id });
 
             res.clearCookie('authCookie');
 
@@ -76,9 +77,9 @@ const routes: FastifyPluginAsync = async app => {
         '/check',
         {
             schema: AuthCheckSchema,
-            preHandler: app.auth([(app as any).verifySession]),
         },
         async (req, res) => {
+            await getUserSessionByCookie(req.cookies);
             res.status(200).send();
         }
     );

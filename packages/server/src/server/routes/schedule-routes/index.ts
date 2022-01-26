@@ -7,7 +7,10 @@ import { getStandardDateFromDateWithTimezone } from '../../../utils/dates.js';
 import { getSchedule, getAirsCount, createAir, updateAir } from '../../../db/schedule.js';
 import { AirType } from '../../../db/schedule.types.js';
 
+import { UserRoles } from '../../../db/users.types.js';
 import { getUser } from '../../../db/users.js';
+
+import { checkUserRoles } from '../../utils/auth.js';
 
 import type { ScheduleQueryParamsType, ScheduleQueryResponseType } from './types.js';
 import { ScheduleParamsSchema, ScheduleResponseSchema } from './schemas.js';
@@ -23,6 +26,8 @@ import { EditAirQueryParamsSchema } from './schemas.js';
 
 const swaggerTags: string[] = ['schedule'];
 
+const streamersRoles = [UserRoles.streamer, UserRoles.admin];
+
 const routes: FastifyPluginAsync = async app => {
     const ScheduleSchema: FastifySchema = {
         tags: swaggerTags,
@@ -36,9 +41,10 @@ const routes: FastifyPluginAsync = async app => {
         '/get-schedule',
         {
             schema: ScheduleSchema,
-            preHandler: app.auth([(app as any).verifyStreamerUserSession]),
         },
         async (req, res) => {
+            await checkUserRoles(req.cookies, streamersRoles);
+
             const RequestParams = req.query as ScheduleQueryParamsType;
 
             const { skip = 0, limit = 20 } = RequestParams;
@@ -76,9 +82,10 @@ const routes: FastifyPluginAsync = async app => {
         '/get-airs-count',
         {
             schema: AirsCountSchema,
-            preHandler: app.auth([(app as any).verifyStreamerUserSession]),
         },
         async (req, res) => {
+            await checkUserRoles(req.cookies, streamersRoles);
+
             const scheduleSize = await getAirsCount();
 
             const responseObject: AirsCountQueryResponseType = {
@@ -113,9 +120,10 @@ const routes: FastifyPluginAsync = async app => {
         '/create-air',
         {
             schema: CreateAirSchema,
-            preHandler: app.auth([(app as any).verifyStreamerUserSession]),
         },
         async (req, res) => {
+            await checkUserRoles(req.cookies, streamersRoles);
+
             const requestBody = req.body as CreateAirQueryParamsType;
 
             const streamerUserId = requestBody.streamer_id;
@@ -160,9 +168,10 @@ const routes: FastifyPluginAsync = async app => {
         '/edit-air',
         {
             schema: EditAirSchema,
-            preHandler: app.auth([(app as any).verifyStreamerUserSession]),
         },
         async (req, res) => {
+            await checkUserRoles(req.cookies, streamersRoles);
+
             const requestBody = req.body as EditAirQueryParamsType;
 
             const streamerUserId = requestBody.streamer_id;
